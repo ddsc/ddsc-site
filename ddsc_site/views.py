@@ -1,4 +1,4 @@
-# (c) Nelen & Schuurmans.  GPL licensed, see LICENSE.rst.
+# (c) Nelen & Schuurmans.  MIT licensed, see LICENSE.rst.
 from __future__ import unicode_literals
 
 from django.utils.translation import ugettext as _
