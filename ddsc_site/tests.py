@@ -1,4 +1,4 @@
-# (c) Nelen & Schuurmans.  MIT licensed, see LICENSE.txt.
+# (c) Nelen & Schuurmans.  MIT licensed, see LICENSE.rst.
 
 from django.test import TestCase
 
