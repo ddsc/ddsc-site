@@ -1,10 +1,7 @@
-ddsc-site
+DDSC-site: front-end Lizard site
 ==========================================
 
-Introduction
-
-Usage, etc.
-
+We're the http://test.dijkdata.nl/ site, installed on ``s-ddsc-ws-d1.external-nens.local``.
 
 
 Symlink a buildout configuration
@@ -16,4 +13,3 @@ correct configuration. On your development machine, that is
 on the server)::
 
     $ ln -s development.cfg buildout.cfg
-
