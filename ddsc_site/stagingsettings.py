@@ -14,3 +14,9 @@ DATABASES = {
 
 # TODO: add staging gauges ID here.
 UI_GAUGES_SITE_ID = ''  # Staging has a separate one.
+
+try:
+    from ddsc_site.localstagingsettings import *
+    # For local staging overrides (DB passwords, for instance)
+except ImportError:
+    pass
