@@ -9,8 +9,9 @@
 import os
 import tempfile
 
-from lizard_ui.settingshelper import setup_logging
+from lizard_ui.layout import Action
 from lizard_ui.settingshelper import STATICFILES_FINDERS
+from lizard_ui.settingshelper import setup_logging
 
 STATICFILES_FINDERS = STATICFILES_FINDERS
 
@@ -133,6 +134,8 @@ MIDDLEWARE_CLASSES = (
 
 INSTALLED_APPS = (
     'ddsc_site',
+    'lizard_wms',
+    'lizard_maptree',
     'lizard_map',
     'lizard_ui',
     'lizard_security',
@@ -157,6 +160,31 @@ INSTALLED_APPS = (
 # TODO: add gauges ID here. Generate one separately for the staging, too.
 UI_GAUGES_SITE_ID = ''  # Staging has a separate one.
 
+
+LIZARD_SITE = 'http://test.dijkdata.nl/'
+MANAGEMENT_SITE = 'http://test.beheer.dijkdata.nl/'
+
+UI_SITE_ACTIONS = [
+    Action(
+        name="Kaart",
+        # description="",
+        # icon="icon-info-sign",
+        # klass="has_popover_south"
+    ),
+    Action(
+        name="Grafieken",
+    ),
+    Action(
+        name="Overzichten",
+    ),
+    Action(
+        name="Beheer",
+        url=MANAGEMENT_SITE,
+        # description="",
+        # icon="icon-info-sign",
+        # klass="has_popover_south"
+    ),
+    ]
 
 try:
     from ddsc_site.localproductionsettings import *
