@@ -23,5 +23,8 @@ urlpatterns = patterns(
     # url(r'^something_else/$',
     #     views.SomeClassBasedView.as_view(),
     #     name='name_it_too'),
+    url(r'^something/$',
+        views.SentryTestView.as_view(),
+        name='name_it_too'),
     )
 urlpatterns += debugmode_urlpatterns()
