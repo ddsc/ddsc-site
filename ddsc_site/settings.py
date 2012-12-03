@@ -155,7 +155,7 @@ INSTALLED_APPS = (
 )
 
 # TODO: Put your real url here to configure Sentry.
-# SENTRY_DSN = 'http://some:thing@sentry.lizardsystem.nl/1'
+SENTRY_DSN = 'http://77c3b9cbccd44e93b4dc25b0a7903490:fc64db9f24ad457ca1ab7378f8153215@sentry.lizardsystem.nl/3'
 
 # TODO: add gauges ID here. Generate one separately for the staging, too.
 UI_GAUGES_SITE_ID = ''  # Staging has a separate one.
