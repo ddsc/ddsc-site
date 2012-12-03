@@ -14,7 +14,7 @@ install_requires = [
     'django-extensions',
     'django-nose',
     'gunicorn',
-    'lizard-map',
+    'lizard-map >= 4.13',
     'lizard-wms',
     'lizard-ui >= 4.0b5',
     'python-memcached',
