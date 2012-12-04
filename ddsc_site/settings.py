@@ -139,6 +139,7 @@ INSTALLED_APPS = (
     'lizard_map',
     'lizard_ui',
     'lizard_security',
+    'rest_framework',
     'south',
     'compressor',
     'staticfiles',
@@ -153,6 +154,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'gunicorn',
 )
+
+USE_TZ = True
 
 # TODO: Put your real url here to configure Sentry.
 SENTRY_DSN = 'http://77c3b9cbccd44e93b4dc25b0a7903490:fc64db9f24ad457ca1ab7378f8153215@sentry.lizardsystem.nl/3'
