@@ -16,6 +16,7 @@ install_requires = [
     'gunicorn',
     'lizard-map >= 4.13',
     'lizard-wms',
+    'lizard-structure',
     'lizard-ui >= 4.0b5',
     'python-memcached',
     'raven',
