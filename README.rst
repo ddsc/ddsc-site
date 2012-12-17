@@ -4,12 +4,14 @@ DDSC-site: front-end Lizard site
 We're the http://test.dijkdata.nl/ site, installed on ``s-ddsc-ws-d1.external-nens.local``.
 
 
-Symlink a buildout configuration
+Building DDSC-site
 --------------------------------
 
-Initially, there's no ``buildout.cfg``. You need to make that a symlink to the
-correct configuration. On your development machine, that is
-``development.cfg`` (and ``staging.cfg`` or ``production.cfg``, for instance
-on the server)::
+To get up and running issue the following commands::
+  
+    $ git clone https://github.com/ddsc/ddsc-site.git
+    $ cd ddsc-site
+    $ pip install --user nensbuild
+    $ nensbuild
 
-    $ ln -s development.cfg buildout.cfg
+The postgis database ddsc_site is needed. Create one with createdb.
