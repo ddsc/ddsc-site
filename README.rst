@@ -13,3 +13,13 @@ correct configuration. On your development machine, that is
 on the server)::
 
     $ ln -s development.cfg buildout.cfg
+
+
+Sample data
+-----------
+
+For testing out the various "reinout-api" branches and lizard-structure, load
+the "demodata" fixture. It contains an empty home screen and a bunch of WMS
+layers (those layers are copied from deltaportaal, btw)::
+
+    $ bin/django loaddata demodata
