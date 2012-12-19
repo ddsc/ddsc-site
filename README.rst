@@ -15,3 +15,12 @@ To get up and running issue the following commands::
     $ nensbuild
 
 The postgis database ddsc_site is needed. Create one with createdb.
+
+Sample data
+-----------
+
+For testing out the various "reinout-api" branches and lizard-structure, load
+the "demodata" fixture. It contains an empty home screen and a bunch of WMS
+layers (those layers are copied from deltaportaal, btw)::
+
+    $ bin/django loaddata demodata
