@@ -9,12 +9,12 @@ long_description = '\n\n'.join([
     ])
 
 install_requires = [
+    # 'gunicorn',
+    # 'raven',
+    'PasteScript',
     'cornice',
     'pyramid',
     'waitress',
-    'PasteScript',
-    # 'gunicorn',
-    # 'raven',
     ],
 
 setup(name='ddsc-site',
