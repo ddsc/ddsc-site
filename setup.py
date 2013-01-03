@@ -9,23 +9,17 @@ long_description = '\n\n'.join([
     ])
 
 install_requires = [
-    'Django',
-    'django-celery',
-    'django-extensions',
-    'django-nose',
-    'gunicorn',
-    'lizard-map >= 4.13',
-    'lizard-wms',
-    'lizard-structure',
-    'lizard-ui >= 4.0b5',
-    'python-memcached',
-    'raven',
-    'werkzeug',
+    'cornice',
+    'pyramid',
+    'waitress',
+    'PasteScript',
+    # 'gunicorn',
+    # 'raven',
     ],
 
 setup(name='ddsc-site',
       version=version,
-      description="Lizard site for showing the data from the DDSC api ",
+      description="Site for providing various JSON data for the DDSC browser client",
       long_description=long_description,
       # Get strings from http://www.python.org/pypi?%3Aaction=list_classifiers
       classifiers=['Programming Language :: Python',
@@ -42,5 +36,9 @@ setup(name='ddsc-site',
       install_requires=install_requires,
       entry_points={
           'console_scripts': [
-          ]},
+          ],
+          'paste.app_factory': [
+            'main = ddsc_site:main',
+            ],
+          },
       )
