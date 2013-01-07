@@ -14,7 +14,11 @@ install_requires = [
     'PasteScript',
     'cornice',
     'pyramid',
+    'pyramid_debugtoolbar',
+    'pyramid_tm',
+    'pyramid_zodbconn',
     'waitress',
+    'ZODB3',
     ],
 
 setup(name='ddsc-site',
