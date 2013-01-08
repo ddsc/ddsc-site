@@ -13,6 +13,7 @@ def root_factory(request):
 
 def main(global_config, **settings):
     config = Configurator(root_factory=root_factory, settings=settings)
+    config.include("pyramid_jinja2")
     config.include("cornice")
     config.scan("ddsc_site.views")
     return config.make_wsgi_app()

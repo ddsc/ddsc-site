@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>{{ view.folder_name }}</title>
+  </head>
+  <body>
+    <h1>{{ view.folder_name }}</h1>
+    <ul>
+      {% for item in view.contents %}
+      <li>
+        <a href="{{ item.url }}">{{ item.name }}</a>
+      </li>
+      {% endfor %}
+    </ul>
+
+  </body>
+</html>
