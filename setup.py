@@ -19,6 +19,8 @@ install_requires = [
     'pyramid_jinja2',
     'pyramid_tm',
     'pyramid_zodbconn',
+    'pyramid_fanstatic',
+    'js.lesscss',
     'repoze.folder',
     'waitress',
     ],
@@ -40,11 +42,15 @@ setup(name='ddsc-site',
       include_package_data=True,
       zip_safe=False,
       install_requires=install_requires,
-      entry_points={
-          'console_scripts': [
-          ],
-          'paste.app_factory': [
-            'main = ddsc_site:main',
-            ],
-          },
+      entry_points="""
+          [paste.app_factory]
+          main = ddsc_site:main
+
+          [fanstatic.libraries]
+          ddsc_site = ddsc_site.resources:library
+
+          # A console script to serve the application and monitor static resources
+          [console_scripts]
+          pserve-fanstatic = ddsc_site.resources:pserve
+""",
       )

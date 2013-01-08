@@ -5,6 +5,7 @@ from cornice.resource import resource
 from cornice.resource import view
 from pyramid.view import view_config
 
+from ddsc_site.resources import ddsc_site_layout
 
 hello = Service(name='hello', path='/api', description="Simplest app")
 # data_source = Service(name='data_source', path='/api/')
@@ -17,6 +18,7 @@ class DefaultFolderView(object):
     def __init__(self, context, request):
         self.context = context
         self.request = request
+        ddsc_site_layout.need()
 
     def _name(self, obj):
         if hasattr(obj, 'name'):

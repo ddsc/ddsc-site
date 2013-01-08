@@ -16,6 +16,7 @@ class WMSSource(Persistent):
 
 class DDSCSite(Folder):
     __parent__ = __name__ = None
+    name = 'DDSC site'
 
 
 class WMSSourcesFolder(Folder):
