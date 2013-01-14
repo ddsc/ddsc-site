@@ -21,6 +21,7 @@ install_requires = [
     'pyramid_zodbconn',
     'pyramid_fanstatic',
     'js.lesscss',
+    'js.bootstrap',
     'repoze.folder',
     'waitress',
     ],

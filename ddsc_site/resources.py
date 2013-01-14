@@ -3,6 +3,7 @@ from fanstatic import Resource
 from fanstatic import Group
 # from js.lesscss import LessResource
 from js.lesscss import lesscss_js
+from js.bootstrap import bootstrap
 
 library = Library('ddsc_site', 'resources')
 # css_resource = Resource(library, 'main.css')
@@ -14,6 +15,7 @@ ddsc_site_layout = Group([
         js_resource,
         less_resource,
         lesscss_js,
+        bootstrap,
         ])
 
 
