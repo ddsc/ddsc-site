@@ -1,4 +1,7 @@
 # (c) Nelen & Schuurmans.  MIT licensed, see LICENSE.rst.
+from __future__ import print_function, unicode_literals
+from __future__ import absolute_import, division
+
 from django.test import TestCase
 
 from django.test.client import RequestFactory
@@ -24,5 +27,13 @@ class LayersTest(TestCase):
 
     def test_serializer(self):
         from ddsc_site.views import WMSLayerSerializer as Serializer
-        data = Serializer(self.wms_source)
-        data.data
+
+        data = Serializer(self.wms_source).data
+
+        keys = ['layer_name', 'display_name', 'url',
+                'description', 'metadata', 'legend_url', 'enable_search',
+                'styles', 'format', 'height', 'width', 'tiled',
+                'transparent', 'wms_url', 'opacity']
+
+        self.assertEquals(keys, data.keys())
+        self.assertEquals('', data['styles'])
