@@ -130,7 +130,7 @@ MIDDLEWARE_CLASSES = (
     # Lizard security.
     'tls.TLSRequestMiddleware',
     'lizard_security.middleware.SecurityMiddleware',
-    )
+)
 
 INSTALLED_APPS = (
     'ddsc_site',
@@ -188,7 +188,11 @@ UI_SITE_ACTIONS = [
         # icon="icon-info-sign",
         # klass="has_popover_south"
     ),
-    ]
+]
+
+
+SKIP_SOUTH_TESTS = True
+SOUTH_TESTS_MIGRATE = False
 
 try:
     from ddsc_site.localproductionsettings import *

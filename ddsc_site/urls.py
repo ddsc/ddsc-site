@@ -3,22 +3,17 @@ from django.conf.urls.defaults import include
 from django.conf.urls.defaults import patterns
 from django.conf.urls.defaults import url
 from django.contrib import admin
-from lizard_map.views import HomepageView
 from lizard_ui.urls import debugmode_urlpatterns
 
-from ddsc_site import views
+from .views import LayerList, LayerDetail
 
 admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^$', HomepageView.as_view()),
+    url(r'^layers/$', LayerList.as_view(), name='layer-list'),
+    url(r'^layers/(?P<pk>\d+)/$', LayerDetail.as_view(),
+        name='layer-detail'),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^webmap/', include('lizard_wms.urls')),
-    url(r'^map/', include('lizard_map.urls')),
-    url(r'^ui/', include('lizard_ui.urls')),
-    url(r'^something/$',
-        views.SentryTestView.as_view(),
-        name='name_it_too'),
-    )
+)
 urlpatterns += debugmode_urlpatterns()
