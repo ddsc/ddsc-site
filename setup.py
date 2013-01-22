@@ -6,7 +6,7 @@ long_description = '\n\n'.join([
     open('README.rst').read(),
     open('CREDITS.rst').read(),
     open('CHANGES.rst').read(),
-    ])
+])
 
 install_requires = [
     'Django',
@@ -21,7 +21,7 @@ install_requires = [
     'python-memcached',
     'raven',
     'werkzeug',
-    ],
+],
 
 setup(name='ddsc-site',
       version=version,
