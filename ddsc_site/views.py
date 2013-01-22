@@ -13,6 +13,7 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = WMSSource
+        exclude = ('connection',)
 
 
 class LayerList(generics.ListCreateAPIView):

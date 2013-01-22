@@ -1,16 +1,19 @@
 # (c) Nelen & Schuurmans.  MIT licensed, see LICENSE.rst.
-
 from django.test import TestCase
 
 from django.test.client import RequestFactory
 
 
 class LayersTest(TestCase):
+
     def setUp(self):
         self.request = RequestFactory()
 
-        from lizard_wms.tests.factories import WMSSourceFactory
-        self.wms_source = WMSSourceFactory.create()
+        from lizard_wms.tests import factories
+
+        self.wms_connection = factories.WMSConnectionFactory.create()
+        self.wms_source = factories.WMSSourceFactory.create(
+            connection=self.wms_connection)
 
     def test_layer(self):
         from ddsc_site.views import LayerList as view
