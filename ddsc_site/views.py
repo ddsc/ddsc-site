@@ -8,36 +8,41 @@ from rest_framework import generics, serializers
 from lizard_wms.models import WMSSource
 
 
+class JSONField(serializers.Field):
+    """Get a Field that is in a JSONField in Django."""
+    def __init__(self, source, dict_name):
+        super(JSONField, self).__init__(source)
+        self.dict_name = dict_name
+
+    def field_to_native(self, obj, field_name):
+        """
+        Given and object and a field name, returns the value that should be
+        serialized for that field.
+        """
+        if obj is None:
+            return self.empty
+
+        data = getattr(obj, self.dict_name)
+        value = data.get(self.source, None)
+        return self.to_native(value)
+
+
 class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
 
     url = serializers.HyperlinkedIdentityField(view_name='layer-detail')
+    search_url = serializers.HyperlinkedIdentityField(view_name='layer-search')
 
-    styles = serializers.SerializerMethodField('get_styles')
-    format = serializers.SerializerMethodField('get_format')
-    height = serializers.SerializerMethodField('get_height')
-    width = serializers.SerializerMethodField('get_width')
-    tiled = serializers.SerializerMethodField('get_tiled')
-    transparent = serializers.SerializerMethodField('get_transparent')
-    wms_url = serializers.SerializerMethodField('get_wms_url')
+    styles = JSONField('styles', '_params')
+    format = JSONField('format', '_params')
+    height = JSONField('height', '_params')
+    width = JSONField('width', '_params')
+    tiled = JSONField('tiled', '_params')
+    transparent = JSONField('transparent', '_params')
+
     opacity = serializers.SerializerMethodField('get_opacity')
+    type = serializers.SerializerMethodField('get_type')
 
-    def get_styles(self, obj):
-        return obj._params['styles']
-
-    def get_format(self, obj):
-        return obj._params['format']
-
-    def get_height(self, obj):
-        return obj._params['height']
-
-    def get_width(self, obj):
-        return obj._params['width']
-
-    def get_tiled(self, obj):
-        return obj._params['tiled']
-
-    def get_transparent(self, obj):
-        return obj._params['transparent']
+    wms_url = serializers.Field('url')
 
     def get_wms_url(self, obj):
         return obj.url
@@ -48,12 +53,15 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
             options = json.loads(options)
         return options['opacity']
 
+    def get_type(self, obj):
+        return 'wms'
+
     class Meta:
         model = WMSSource
         fields = ('layer_name', 'display_name', 'url',
                   'description', 'metadata', 'legend_url', 'enable_search',
                   'styles', 'format', 'height', 'width', 'tiled',
-                  'transparent', 'wms_url', 'opacity')
+                  'transparent', 'wms_url', 'opacity', 'type', 'search_url')
 
 
 class LayerList(generics.ListCreateAPIView):

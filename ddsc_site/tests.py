@@ -33,7 +33,8 @@ class LayersTest(TestCase):
         keys = ['layer_name', 'display_name', 'url',
                 'description', 'metadata', 'legend_url', 'enable_search',
                 'styles', 'format', 'height', 'width', 'tiled',
-                'transparent', 'wms_url', 'opacity']
+                'transparent', 'wms_url', 'opacity', 'type', 'search_url']
 
         self.assertEquals(keys, data.keys())
         self.assertEquals('', data['styles'])
+        self.assertEquals('wms', data['type'])
