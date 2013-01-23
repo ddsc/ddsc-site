@@ -5,6 +5,7 @@ from __future__ import absolute_import, division
 import json
 
 from rest_framework import generics, serializers
+
 from lizard_wms.models import WMSSource
 
 
@@ -16,7 +17,7 @@ class JSONField(serializers.Field):
 
     def field_to_native(self, obj, field_name):
         """
-        Given and object and a field name, returns the value that should be
+        Given an object and a field name, returns the value that should be
         serialized for that field.
         """
         if obj is None:

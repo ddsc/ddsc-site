@@ -11,11 +11,12 @@ admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^layers/$', LayerList.as_view(), name='layer-list'),
-    url(r'^layers/(?P<pk>\d+)/$', LayerDetail.as_view(),
+    url(r'^v0/layers/$', LayerList.as_view(), name='layer-list'),
+    url(r'^v0/layers/(?P<pk>\d+)/$', LayerDetail.as_view(),
         name='layer-detail'),
-    url(r'^layers/(?P<pk>\d+)/search/$', LayerDetail.as_view(),
+    url(r'^v0/layers/(?P<pk>\d+)/search/$', LayerDetail.as_view(),
         name='layer-search'),
+
     url(r'^admin/', include(admin.site.urls)),
 )
 urlpatterns += debugmode_urlpatterns()
