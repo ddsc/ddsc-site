@@ -138,7 +138,6 @@ INSTALLED_APPS = (
     'lizard_maptree',
     'lizard_map',
     'lizard_ui',
-    'lizard_structure',
     'lizard_security',
     'rest_framework',
     'south',
