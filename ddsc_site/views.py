@@ -30,8 +30,9 @@ class JSONField(serializers.Field):
 
 class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
 
-    url = serializers.HyperlinkedIdentityField(view_name='layer-detail')
-    search_url = serializers.HyperlinkedIdentityField(view_name='layer-search')
+    url = serializers.HyperlinkedIdentityField(view_name='layers-detail')
+    search_url = serializers.HyperlinkedIdentityField(
+        view_name='layers-search')
 
     styles = JSONField('styles', '_params')
     format = JSONField('format', '_params')
