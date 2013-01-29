@@ -9,7 +9,6 @@
 import os
 import tempfile
 
-from lizard_ui.layout import Action
 from lizard_ui.settingshelper import STATICFILES_FINDERS
 from lizard_ui.settingshelper import setup_logging
 
@@ -156,38 +155,6 @@ INSTALLED_APPS = (
 )
 
 USE_TZ = True
-
-# TODO: Put your real url here to configure Sentry.
-SENTRY_DSN = 'http://77c3b9cbccd44e93b4dc25b0a7903490:fc64db9f24ad457ca1ab7378f8153215@sentry.lizardsystem.nl/3'
-
-# TODO: add gauges ID here. Generate one separately for the staging, too.
-UI_GAUGES_SITE_ID = ''  # Staging has a separate one.
-
-
-LIZARD_SITE = 'http://test.dijkdata.nl/'
-MANAGEMENT_SITE = 'http://test.beheer.dijkdata.nl/'
-
-UI_SITE_ACTIONS = [
-    Action(
-        name="Kaart",
-        # description="",
-        # icon="icon-info-sign",
-        # klass="has_popover_south"
-    ),
-    Action(
-        name="Grafieken",
-    ),
-    Action(
-        name="Overzichten",
-    ),
-    Action(
-        name="Beheer",
-        url=MANAGEMENT_SITE,
-        # description="",
-        # icon="icon-info-sign",
-        # klass="has_popover_south"
-    ),
-]
 
 REST_FRAMEWORK = {
     'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend',
