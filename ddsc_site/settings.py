@@ -189,6 +189,12 @@ UI_SITE_ACTIONS = [
     ),
 ]
 
+REST_FRAMEWORK = {
+    'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend',
+    'PAGINATE_BY': 10,
+    'PAGINATE_BY_PARAM': 'page_size'
+}
+
 
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False

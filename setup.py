@@ -13,6 +13,7 @@ install_requires = [
     'django-celery',
     'django-extensions',
     'django-nose',
+    'django-filter',
     'gunicorn',
     'lizard-map >= 4.13',
     'lizard-wms',
