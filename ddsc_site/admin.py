@@ -5,5 +5,5 @@ from django.contrib import admin
 
 from ddsc_site import models
 
-
-# admin.site.register(models.TODO)
+admin.site.register(models.Collage)
+admin.site.register(models.CollageItem)
