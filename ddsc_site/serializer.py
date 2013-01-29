@@ -26,16 +26,18 @@ class JSONField(serializers.Field):
 
 
 class CollageSerializer(serializers.HyperlinkedModelSerializer):
+    items = serializers.HyperlinkedRelatedField(
+        'collageitem_set', view_name="collageitem-detail")
+
     id = serializers.Field('id')
 
     class Meta:
-        fields = ('url', 'id', 'name')
+        fields = ('id', 'url', 'name', 'items')
         model = Collage
 
 
 class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
-
-    url = serializers.HyperlinkedIdentityField(view_name='layers-detail')
+    url = serializers.HyperlinkedIdentityField(view_name='layer-detail')
 
     styles = JSONField('styles', '_params')
     format = JSONField('format', '_params')
@@ -66,4 +68,4 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
         fields = ('layer_name', 'display_name', 'url',
                   'description', 'metadata', 'legend_url', 'enable_search',
                   'styles', 'format', 'height', 'width', 'tiled',
-                  'transparent', 'wms_url', 'opacity', 'type', 'search_url')
+                  'transparent', 'wms_url', 'opacity', 'type')
