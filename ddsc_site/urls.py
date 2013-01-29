@@ -5,15 +5,21 @@ from django.conf.urls.defaults import url
 from django.contrib import admin
 from lizard_ui.urls import debugmode_urlpatterns
 
-from .views import LayerList, LayerDetail
+from ddsc_site import views
 
 admin.autodiscover()
 
 urlpatterns = patterns(
     '',
-    url(r'^v0/layers/$', LayerList.as_view(), name='layers-list'),
-    url(r'^v0/layers/(?P<pk>\d+)/$', LayerDetail.as_view(),
+
+    url(r'^v0/collages/$', views.CollageList.as_view(), name='collage-list'),
+    url(r'^v0/collages/(?P<pk>\d+)/$', views.CollageDetail.as_view(),
+        name='collage-detail'),
+
+    url(r'^v0/layers/$', views.LayerList.as_view(), name='layers-list'),
+    url(r'^v0/layers/(?P<pk>\d+)/$', views.LayerDetail.as_view(),
         name='layers-detail'),
+
 
     url(r'^admin/', include(admin.site.urls)),
 )
