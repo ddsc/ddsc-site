@@ -14,8 +14,6 @@ urlpatterns = patterns(
     url(r'^v0/layers/$', LayerList.as_view(), name='layers-list'),
     url(r'^v0/layers/(?P<pk>\d+)/$', LayerDetail.as_view(),
         name='layers-detail'),
-    url(r'^v0/layers/(?P<pk>\d+)/search/$', LayerDetail.as_view(),
-        name='layers-search'),
 
     url(r'^admin/', include(admin.site.urls)),
 )
