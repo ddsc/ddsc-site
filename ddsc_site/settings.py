@@ -129,6 +129,7 @@ MIDDLEWARE_CLASSES = (
     # Lizard security.
     'tls.TLSRequestMiddleware',
     'lizard_security.middleware.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 )
 
 INSTALLED_APPS = (
@@ -144,6 +145,7 @@ INSTALLED_APPS = (
     'staticfiles',
     'raven.contrib.django',
     'django_extensions',
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -162,6 +164,7 @@ REST_FRAMEWORK = {
     'PAGINATE_BY_PARAM': 'page_size'
 }
 
+CORS_ORIGIN_ALLOW_ALL = True
 
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False

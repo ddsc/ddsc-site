@@ -14,6 +14,7 @@ install_requires = [
     'django-extensions',
     'django-nose',
     'django-filter',
+    'django-cors-headers',
     'gunicorn',
     'lizard-map >= 4.13',
     'lizard-wms',
