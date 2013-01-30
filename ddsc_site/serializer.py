@@ -25,11 +25,6 @@ class JSONField(serializers.Field):
         return self.to_native(value)
 
 
-class ManyRelatedField2(serializers.ManyRelatedField):
-    def to_native(self, obj):
-        return CollageItemSerializer().to_native(obj)
-
-
 class CollageItemSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.Field('id')
 
