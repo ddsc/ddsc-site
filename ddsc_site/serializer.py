@@ -25,18 +25,24 @@ class JSONField(serializers.Field):
         return self.to_native(value)
 
 
-class CollageItemSerializer(serializers.HyperlinkedModelSerializer):
+class HyperlinkedIdModelSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.Field('id')
 
+
+class CollageItemSerializer(HyperlinkedIdModelSerializer):
     class Meta:
         fields = ('id', 'url', 'name', 'collage')
         model = CollageItem
 
 
-class CollageSerializer(serializers.HyperlinkedModelSerializer):
-    collageitems = CollageItemSerializer(source='collageitem_set')
+class CollageItemNestedSerializer(HyperlinkedIdModelSerializer):
+    class Meta:
+        fields = ('id', 'name', 'url')
+        model = CollageItem
 
-    id = serializers.Field('id')
+
+class CollageSerializer(HyperlinkedIdModelSerializer):
+    collageitems = CollageItemNestedSerializer(source='collageitem_set')
 
     class Meta:
         fields = ('id', 'url', 'name', 'collageitems')
