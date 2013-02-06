@@ -160,8 +160,6 @@ USE_TZ = True
 
 REST_FRAMEWORK = {
     'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend',
-    'PAGINATE_BY': 10,
-    'PAGINATE_BY_PARAM': 'page_size'
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
