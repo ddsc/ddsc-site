@@ -7,8 +7,8 @@ from lizard_wms.models import WMSSource
 from rest_framework import generics
 
 from .serializers import WMSLayerSerializer
-from .serializers import CollageSerializer, CollageItemSerializer
-from .models import Collage, CollageItem
+from .serializers import CollageSerializer
+from .models import Collage
 
 
 class CollageList(generics.ListCreateAPIView):
@@ -19,16 +19,6 @@ class CollageList(generics.ListCreateAPIView):
 class CollageDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Collage
     serializer_class = CollageSerializer
-
-
-class CollageItemList(generics.ListCreateAPIView):
-    model = CollageItem
-    serializer_class = CollageItemSerializer
-
-
-class CollageItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    model = CollageItem
-    serializer_class = CollageItemSerializer
 
 
 class LayerList(generics.ListCreateAPIView):

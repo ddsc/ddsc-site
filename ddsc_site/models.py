@@ -4,21 +4,13 @@ from __future__ import absolute_import, division
 
 from django.db import models
 
+from jsonfield.fields import JSONField
+
 
 class Collage(models.Model):
     """Collages."""
 
-    name = models.CharField(max_length=100)
+    data = JSONField(null=True, blank=True)
 
     def __unicode__(self):
-        return self.name
-
-
-class CollageItem(models.Model):
-    """Collage Items."""
-
-    name = models.CharField(max_length=100)
-    collage = models.ForeignKey(Collage)
-
-    def __unicode__(self):
-        return '{} ({})'.format(self.name, self.collage.name)
+        return self.data
