@@ -6,8 +6,8 @@ from lizard_wms.models import WMSSource
 
 from rest_framework import generics
 
-from .serializer import WMSLayerSerializer
-from .serializer import CollageSerializer, CollageItemSerializer
+from .serializers import WMSLayerSerializer
+from .serializers import CollageSerializer, CollageItemSerializer
 from .models import Collage, CollageItem
 
 
