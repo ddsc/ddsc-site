@@ -3,6 +3,7 @@ from django.conf.urls.defaults import include
 from django.conf.urls.defaults import patterns
 from django.conf.urls.defaults import url
 from django.contrib import admin
+from django.conf import settings
 from lizard_ui.urls import debugmode_urlpatterns
 
 from ddsc_site import views
@@ -36,6 +37,24 @@ urlpatterns = patterns(
     url(r'^v0/layers/(?P<pk>\d+)/$', views.LayerDetail.as_view(),
         name='layer-detail'),
 
-    url(r'^admin/', include(admin.site.urls)),
+    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
+    url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
+        name='ddsc_site.sso-login'),
+
+    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
+    url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
+        name='ddsc_site.sso-login'),
+    url(r'^v0/account/logout-url/$', views.SSOLogout.as_view(),
+        name='ddsc_site.sso-logout'),
+
 )
 urlpatterns += debugmode_urlpatterns()
+
+
+if settings.DEBUG is True:
+    urlpatterns += patterns(
+        '',
+
+        url(r'^', include('lizard_auth_client.urls')),
+        url(r'^admin/', include(admin.site.urls)),
+    )
