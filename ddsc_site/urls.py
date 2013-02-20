@@ -18,9 +18,19 @@ urlpatterns = patterns(
 
     url(r'^v0/collageitems/$', views.CollageItemList.as_view(),
         name='collageitem-list'),
-    url(r'^v0/collageitem-detal/(?P<pk>\d+)/$',
+    url(r'^v0/collageitems/(?P<pk>\d+)/$',
         views.CollageItemDetail.as_view(),
         name='collageitem-detail'),
+
+    url(r'^v0/workspaces/$', views.WorkspaceList.as_view(), name='workspace-list'),
+    url(r'^v0/workspaces/(?P<pk>\d+)/$', views.WorkspaceDetail.as_view(),
+        name='workspace-detail'),
+
+    url(r'^v0/workspaceitems/$', views.WorkspaceItemList.as_view(),
+        name='workspaceitem-list'),
+    url(r'^v0/workspaceitems/(?P<pk>\d+)/$',
+        views.WorkspaceItemDetail.as_view(),
+        name='workspaceitem-detail'),
 
     url(r'^v0/layers/$', views.LayerList.as_view(), name='layer-list'),
     url(r'^v0/layers/(?P<pk>\d+)/$', views.LayerDetail.as_view(),

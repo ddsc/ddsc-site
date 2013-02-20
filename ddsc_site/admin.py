@@ -7,3 +7,5 @@ from ddsc_site import models
 
 admin.site.register(models.Collage)
 admin.site.register(models.CollageItem)
+admin.site.register(models.Workspace)
+admin.site.register(models.WorkspaceItem)

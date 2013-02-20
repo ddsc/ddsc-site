@@ -3,8 +3,9 @@ import json
 from rest_framework import serializers
 
 from lizard_wms.models import WMSSource
-from .models import Collage, CollageItem
+from .models import Collage, CollageItem, Workspace, WorkspaceItem
 
+from ddsc_site.filters import objects_for_user_groups
 
 class JSONField(serializers.Field):
     """Get a Field that is in a JSONField in Django."""
@@ -21,7 +22,10 @@ class JSONField(serializers.Field):
             return self.empty
 
         data = getattr(obj, self.dict_name)
-        value = data.get(self.source, None)
+        if data is None:
+            value = None
+        else:
+            value = data.get(self.source, None)
         return self.to_native(value)
 
 
@@ -31,7 +35,7 @@ class HyperlinkedIdModelSerializer(serializers.HyperlinkedModelSerializer):
 
 class CollageItemSerializer(HyperlinkedIdModelSerializer):
     class Meta:
-        fields = ('id', 'url', 'collage', 'graph_id', 'timeseries')
+        fields = ('id', 'url', 'collage', 'graph_index', 'timeseries')
         model = CollageItem
 
 
@@ -76,3 +80,38 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
                   'description', 'metadata', 'legend_url', 'enable_search',
                   'styles', 'format', 'height', 'width', 'tiled',
                   'transparent', 'wms_url', 'opacity', 'type')
+
+
+class FilteredGroupField(serializers.PrimaryKeyRelatedField):
+    # keep this, so DRF generates a null choice!
+    empty_label = '-------------'
+    def initialize(self, *args, **kwargs):
+        result = super(FilteredGroupField, self).initialize(*args, **kwargs)
+        if 'request' in self.context:
+            self.queryset = self.context['request'].user.groups.all()
+        return result
+
+
+class FilteredWorkspaceField(serializers.HyperlinkedRelatedField):
+    def initialize(self, *args, **kwargs):
+        result = super(FilteredWorkspaceField, self).initialize(*args, **kwargs)
+        if 'request' in self.context:
+            self.queryset = objects_for_user_groups(Workspace, self.context['request'].user)
+        return result
+
+
+class WorkspaceItemSerializer(HyperlinkedIdModelSerializer):
+    wms_source = serializers.HyperlinkedRelatedField(view_name='layer-detail')
+    workspace = FilteredWorkspaceField(view_name='workspace-detail')
+
+    class Meta:
+        model = WorkspaceItem
+
+
+class WorkspaceListSerializer(HyperlinkedIdModelSerializer):
+    workspaceitems = WorkspaceItemSerializer(source='workspaceitem_set')
+    # null=True is deprecated, but there's no viable alternative yet!
+    group = FilteredGroupField(null=True, required=False)
+
+    class Meta:
+        model = Workspace
