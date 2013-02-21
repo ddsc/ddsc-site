@@ -130,6 +130,7 @@ MIDDLEWARE_CLASSES = (
     'tls.TLSRequestMiddleware',
     'lizard_security.middleware.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
+    'ddsc_site.middleware.CookieMiddleware'
 )
 
 INSTALLED_APPS = (
@@ -162,7 +163,11 @@ REST_FRAMEWORK = {
     'FILTER_BACKEND': 'rest_framework.filters.DjangoFilterBackend',
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = False
+CORS_ORIGIN_WHITELIST = (
+    'localhost',
+)
 
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False

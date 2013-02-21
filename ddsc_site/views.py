@@ -2,6 +2,8 @@
 from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 
+from django.conf import settings
+
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -76,10 +78,7 @@ class CurrentAccount(APIView):
 class SSOLogin(APIView):
 
     def get(self, request, format=None):
-
-        request.session['sso_after_login_next'] = 'http://localhost:8000'
-        import pdb; pdb.set_trace()
-        print(request.COOKIES['sessionid'])
+        request.session['sso_after_login_next'] = settings.WEBCLIENT
         sso_request = get_sso_request()
         if sso_request.status_code == 302:
             login_url = sso_request.message

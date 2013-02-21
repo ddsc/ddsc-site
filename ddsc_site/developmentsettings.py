@@ -31,6 +31,12 @@ DATABASES = {
     }
 
 
+CORS_ORIGIN_WHITELIST = (
+    'localhost',
+)
+
+WEBCLIENT = 'http://localhost:8000'
+
 try:
     from ddsc_site.localsettings import *
     # For local dev overrides.
