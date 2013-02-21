@@ -7,6 +7,7 @@ from django.conf import settings
 from lizard_ui.urls import debugmode_urlpatterns
 
 from ddsc_site import views
+from lizard_auth_client.views import LoginApiView, LogoutApiView
 
 admin.autodiscover()
 
@@ -37,15 +38,12 @@ urlpatterns = patterns(
     url(r'^v0/layers/(?P<pk>\d+)/$', views.LayerDetail.as_view(),
         name='layer-detail'),
 
-#    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
-#    url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
-#        name='ddsc_site.sso-login'),
-#
-#    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
-    url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
+    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
+    url(r'^v0/account/login-url/$', LoginApiView.as_view(),
         name='ddsc_site.sso-login'),
-#    url(r'^v0/account/logout-url/$', views.SSOLogout.as_view(),
-#        name='ddsc_site.sso-logout'),
+    url(r'^v0/account/logout-url/$', LogoutApiView.as_view(),
+        name='ddsc_site.sso-logout'),
+
     url(r'^', include('lizard_auth_client.urls')),
 )
 urlpatterns += debugmode_urlpatterns()

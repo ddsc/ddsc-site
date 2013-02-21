@@ -12,10 +12,6 @@ from rest_framework.response import Response
 
 from lizard_wms.models import WMSSource
 
-'''
-from lizard_auth_client.views import get_sso_request, get_sso_logout
-'''
-
 from ddsc_site import serializers
 from ddsc_site.filters import objects_for_user_groups
 
@@ -98,7 +94,6 @@ class LayerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CurrentAccount(APIView):
-
     def get(self, request, format=None):
         """
         Return account information.
@@ -119,37 +114,3 @@ class CurrentAccount(APIView):
                              'last_name': ''}
                     }
         return Response(data)
-
-class SSOLogin(APIView):
-    @method_decorator(login_required)
-    def get(self, request, format=None):
-        return Response({})
-
-'''
-class SSOLogin(APIView):
-    @method_decorator(login_required)
-    def get(self, request, format=None):
-        # Redirect to the webclient after the SSO server dance
-        request.session['sso_after_login_next'] = settings.WEBCLIENT
-
-        # Get the login url with the token
-        sso_request = get_sso_request()
-
-        # The response is a redirect (302) to the SSO server
-        if sso_request.status_code == 302:
-            login_url = sso_request.message
-            return Response({'login_url': login_url})
-
-        # Return the error message to the user
-        return Response({'message': sso_request.message},
-                        status=sso_request.status_code)
-
-
-class SSOLogout(APIView):
-    def get(self, request, format=None):
-        # Redirect to the webclient after the SSO server dance
-        request.session['sso_after_logout_next'] = settings.WEBCLIENT
-
-        logout_url = get_sso_logout()
-        return Response({'logout_url': logout_url})
-'''
