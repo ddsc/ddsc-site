@@ -21,6 +21,11 @@ urlpatterns = patterns(
         name='layer-detail'),
 
 
+    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
+    url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
+        name='ddsc_site.sso-login'),
+
+    url(r'^', include('lizard_auth_client.urls')),
     url(r'^admin/', include(admin.site.urls)),
 )
 urlpatterns += debugmode_urlpatterns()
