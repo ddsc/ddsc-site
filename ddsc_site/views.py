@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.filters import BaseFilterBackend
 
 from lizard_wms.models import WMSSource
 
@@ -20,42 +21,48 @@ from .serializers import CollageSerializer, CollageItemSerializer
 from .models import Collage, CollageItem, Workspace, WorkspaceItem
 
 
-class GroupFilterMixin(object):
-    group_field = 'group'
+class GroupFilterBackend(BaseFilterBackend):
+    DEFAULT_GROUP_FIELD = 'group'
 
-    def get_queryset(self):
+    def filter_queryset(self, request, queryset, view):
         '''
         Returns a subset of the model instances, filtered on the groups the user is currently in.
         Instances with a null group are included as well.
         '''
-        return objects_for_user_groups(self.model, self.request.user, self.group_field)
+        group_field = view.group_field if hasattr(view, 'group_field') else self.DEFAULT_GROUP_FIELD
+        return objects_for_user_groups(view.model, request.user, queryset, group_field)
 
 
-class CollageList(GroupFilterMixin, generics.ListCreateAPIView):
+class CollageList(generics.ListCreateAPIView):
     model = Collage
     serializer_class = CollageSerializer
+    filter_backend = GroupFilterBackend
 
 
-class CollageDetail(GroupFilterMixin, generics.RetrieveUpdateDestroyAPIView):
+class CollageDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Collage
     serializer_class = CollageSerializer
+    filter_backend = GroupFilterBackend
 
 
-class CollageItemList(GroupFilterMixin, generics.ListCreateAPIView):
+class CollageItemList(generics.ListCreateAPIView):
     model = CollageItem
     serializer_class = CollageItemSerializer
     group_field = 'collage__group'
+    filter_backend = GroupFilterBackend
 
 
-class CollageItemDetail(GroupFilterMixin, generics.RetrieveUpdateDestroyAPIView):
+class CollageItemDetail(generics.RetrieveUpdateDestroyAPIView):
     model = CollageItem
     serializer_class = CollageItemSerializer
     group_field = 'collage__group'
+    filter_backend = GroupFilterBackend
 
 
-class WorkspaceList(GroupFilterMixin, generics.ListCreateAPIView):
+class WorkspaceList(generics.ListCreateAPIView):
     model = Workspace
     serializer_class = serializers.WorkspaceListSerializer
+    filter_backend = GroupFilterBackend
 #    serializer_class_list = serializers.WorkspaceListSerializer
 #    serializer_class_create = serializers.WorkspaceCreateSerializer
 #
@@ -66,21 +73,24 @@ class WorkspaceList(GroupFilterMixin, generics.ListCreateAPIView):
 #            return self.serializer_class_list
 
 
-class WorkspaceDetail(GroupFilterMixin, generics.RetrieveUpdateDestroyAPIView):
+class WorkspaceDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Workspace
     serializer_class = serializers.WorkspaceListSerializer
+    filter_backend = GroupFilterBackend
 
 
-class WorkspaceItemList(GroupFilterMixin, generics.ListCreateAPIView):
+class WorkspaceItemList(generics.ListCreateAPIView):
     model = WorkspaceItem
     serializer_class = serializers.WorkspaceItemSerializer
     group_field = 'workspace__group'
+    filter_backend = GroupFilterBackend
 
 
-class WorkspaceItemDetail(GroupFilterMixin, generics.RetrieveUpdateDestroyAPIView):
+class WorkspaceItemDetail(generics.RetrieveUpdateDestroyAPIView):
     model = WorkspaceItem
     serializer_class = serializers.WorkspaceItemSerializer
     group_field = 'workspace__group'
+    filter_backend = GroupFilterBackend
 
 
 class LayerList(generics.ListCreateAPIView):

@@ -96,12 +96,13 @@ class FilteredWorkspaceField(serializers.HyperlinkedRelatedField):
     def initialize(self, *args, **kwargs):
         result = super(FilteredWorkspaceField, self).initialize(*args, **kwargs)
         if 'request' in self.context:
-            self.queryset = objects_for_user_groups(Workspace, self.context['request'].user)
+            self.queryset = objects_for_user_groups(Workspace, self.context['request'].user, self.queryset)
         return result
 
 
 class WorkspaceItemSerializer(HyperlinkedIdModelSerializer):
-    wms_source = serializers.HyperlinkedRelatedField(view_name='layer-detail')
+    #wms_source = serializers.HyperlinkedRelatedField(view_name='layer-detail')
+    wms_source = WMSLayerSerializer(source='wms_source')
     workspace = FilteredWorkspaceField(view_name='workspace-detail')
 
     class Meta:
