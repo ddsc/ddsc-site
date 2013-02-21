@@ -37,16 +37,16 @@ urlpatterns = patterns(
     url(r'^v0/layers/(?P<pk>\d+)/$', views.LayerDetail.as_view(),
         name='layer-detail'),
 
-    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
+#    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
+#    url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
+#        name='ddsc_site.sso-login'),
+#
+#    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
     url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
         name='ddsc_site.sso-login'),
-
-    url(r'^v0/account/$', views.CurrentAccount.as_view(), name='account'),
-    url(r'^v0/account/login-url/$', views.SSOLogin.as_view(),
-        name='ddsc_site.sso-login'),
-    url(r'^v0/account/logout-url/$', views.SSOLogout.as_view(),
-        name='ddsc_site.sso-logout'),
-
+#    url(r'^v0/account/logout-url/$', views.SSOLogout.as_view(),
+#        name='ddsc_site.sso-logout'),
+    url(r'^', include('lizard_auth_client.urls')),
 )
 urlpatterns += debugmode_urlpatterns()
 
@@ -54,7 +54,5 @@ urlpatterns += debugmode_urlpatterns()
 if settings.DEBUG is True:
     urlpatterns += patterns(
         '',
-
-        url(r'^', include('lizard_auth_client.urls')),
         url(r'^admin/', include(admin.site.urls)),
     )

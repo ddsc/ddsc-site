@@ -3,6 +3,8 @@ from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 
 from django.conf import settings
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -10,7 +12,9 @@ from rest_framework.response import Response
 
 from lizard_wms.models import WMSSource
 
+'''
 from lizard_auth_client.views import get_sso_request, get_sso_logout
+'''
 
 from ddsc_site import serializers
 from ddsc_site.filters import objects_for_user_groups
@@ -116,9 +120,14 @@ class CurrentAccount(APIView):
                     }
         return Response(data)
 
-
 class SSOLogin(APIView):
+    @method_decorator(login_required)
+    def get(self, request, format=None):
+        return Response({})
 
+'''
+class SSOLogin(APIView):
+    @method_decorator(login_required)
     def get(self, request, format=None):
         # Redirect to the webclient after the SSO server dance
         request.session['sso_after_login_next'] = settings.WEBCLIENT
@@ -143,3 +152,4 @@ class SSOLogout(APIView):
 
         logout_url = get_sso_logout()
         return Response({'logout_url': logout_url})
+'''
