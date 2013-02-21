@@ -16,10 +16,15 @@ urlpatterns = patterns(
     url(r'^v0/collages/(?P<pk>\d+)/$', views.CollageDetail.as_view(),
         name='collage-detail'),
 
+    url(r'^v0/collageitems/$', views.CollageItemList.as_view(),
+        name='collageitem-list'),
+    url(r'^v0/collageitem-detal/(?P<pk>\d+)/$',
+        views.CollageItemDetail.as_view(),
+        name='collageitem-detail'),
+
     url(r'^v0/layers/$', views.LayerList.as_view(), name='layer-list'),
     url(r'^v0/layers/(?P<pk>\d+)/$', views.LayerDetail.as_view(),
         name='layer-detail'),
-
 
     url(r'^admin/', include(admin.site.urls)),
 )
