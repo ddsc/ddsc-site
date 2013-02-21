@@ -3,7 +3,7 @@ import json
 from rest_framework import serializers
 
 from lizard_wms.models import WMSSource
-from .models import Collage
+from .models import Collage, CollageItem
 
 
 class JSONField(serializers.Field):
@@ -29,9 +29,17 @@ class HyperlinkedIdModelSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.Field('id')
 
 
-class CollageSerializer(HyperlinkedIdModelSerializer):
+class CollageItemSerializer(HyperlinkedIdModelSerializer):
     class Meta:
-        fields = ('id', 'url', 'data')
+        fields = ('id', 'url', 'collage', 'graph_id', 'timeseries')
+        model = CollageItem
+
+
+class CollageSerializer(HyperlinkedIdModelSerializer):
+    collageitems = CollageItemSerializer(source='collageitem_set')
+
+    class Meta:
+        fields = ('id', 'url', 'name', 'collageitems')
         model = Collage
 
 

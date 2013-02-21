@@ -12,8 +12,8 @@ from lizard_wms.models import WMSSource
 from lizard_auth_client.views import get_sso_request
 
 from .serializers import WMSLayerSerializer
-from .serializers import CollageSerializer
-from .models import Collage
+from .serializers import CollageSerializer, CollageItemSerializer
+from .models import Collage, CollageItem
 
 
 class CollageList(generics.ListCreateAPIView):
@@ -24,6 +24,16 @@ class CollageList(generics.ListCreateAPIView):
 class CollageDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Collage
     serializer_class = CollageSerializer
+
+
+class CollageItemList(generics.ListCreateAPIView):
+    model = CollageItem
+    serializer_class = CollageItemSerializer
+
+
+class CollageItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    model = CollageItem
+    serializer_class = CollageItemSerializer
 
 
 class LayerList(generics.ListCreateAPIView):
