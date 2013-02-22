@@ -44,6 +44,8 @@ urlpatterns = patterns(
     url(r'^v0/account/logout-url/$', LogoutApiView.as_view(),
         name='ddsc_site.sso-logout'),
 
+    url(r'^v0/proxy/$', views.ProxyView.as_view(), name='proxy'),
+
     url(r'^', include('lizard_auth_client.urls')),
 )
 urlpatterns += debugmode_urlpatterns()

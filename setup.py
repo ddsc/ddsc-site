@@ -22,6 +22,7 @@ install_requires = [
     'lizard-auth-client',
     'python-memcached',
     'raven',
+    'requests',
     'werkzeug',
 ],
 
