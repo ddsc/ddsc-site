@@ -53,9 +53,10 @@ class Workspace(models.Model):
     visibility = models.SmallIntegerField(default=1, choices=VISIBILITY_CHOICES)
     creator = models.ForeignKey(User)
     lon_lat_zoom = models.CharField(max_length=255, null=True, blank=True)
+    order = models.IntegerField(default=0)
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('order',)
 
     def __unicode__(self):
         return "Workspace {0}".format(self.name)
