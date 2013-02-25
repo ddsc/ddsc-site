@@ -165,8 +165,11 @@ REST_FRAMEWORK = {
 CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = False
 CORS_ORIGIN_WHITELIST = (
-    'localhost',
+    'dijkdata.nl',
 )
+
+WEBCLIENT = 'http://dijkdata.nl'
+
 
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False
