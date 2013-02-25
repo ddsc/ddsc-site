@@ -130,7 +130,6 @@ MIDDLEWARE_CLASSES = (
     'tls.TLSRequestMiddleware',
     'lizard_security.middleware.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
-    'ddsc_site.middleware.CookieMiddleware'
 )
 
 INSTALLED_APPS = (

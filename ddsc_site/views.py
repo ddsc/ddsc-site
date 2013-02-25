@@ -7,11 +7,10 @@ from django.conf import settings
 from rest_framework import generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 
 from lizard_wms.models import WMSSource
 
-from lizard_auth_client.views import get_sso_request
+from lizard_auth_client.views import get_sso_request, get_sso_logout
 
 from .serializers import WMSLayerSerializer
 from .serializers import CollageSerializer, CollageItemSerializer
@@ -55,33 +54,46 @@ class CurrentAccount(APIView):
         Return account information.
         """
 
-        data = {}
-        data['login_url'] = reverse('ddsc_site.sso-login', request=request)
-
         if request.user.is_authenticated():
             user = request.user
-
-            data['authenticated'] = True
-            data['user'] = {'username': user.username,
-                            'first_name': user.first_name,
-                            'last_name': user.last_name}
+            data = {'authenticated': True,
+                    'user': {'username': user.username,
+                             'first_name': user.first_name,
+                             'last_name': user.last_name}
+                    }
 
         else:
-            data['authenticated'] = False
-            data['user'] = {'username': '',
-                            'first_name': '',
-                            'last_name': ''}
-
+            data = {'authenticated': False,
+                    'user': {'username': '',
+                             'first_name': '',
+                             'last_name': ''}
+                    }
         return Response(data)
 
 
 class SSOLogin(APIView):
 
     def get(self, request, format=None):
+        # Redirect to the webclient after the SSO server dance
         request.session['sso_after_login_next'] = settings.WEBCLIENT
+
+        # Get the login url with the token
         sso_request = get_sso_request()
+
+        # The response is a redirect (302) to the SSO server
         if sso_request.status_code == 302:
             login_url = sso_request.message
             return Response({'login_url': login_url})
+
+        # Return the error message to the user
         return Response({'message': sso_request.message},
                         status=sso_request.status_code)
+
+
+class SSOLogout(APIView):
+    def get(self, request, format=None):
+        # Redirect to the webclient after the SSO server dance
+        request.session['sso_after_logout_next'] = settings.WEBCLIENT
+
+        logout_url = get_sso_logout()
+        return Response({'logout_url': logout_url})
