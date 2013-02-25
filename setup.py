@@ -19,6 +19,7 @@ install_requires = [
     'lizard-map >= 4.13',
     'lizard-wms',
     'lizard-ui >= 4.0b5',
+    'lizard-auth-client',
     'python-memcached',
     'raven',
     'werkzeug',
