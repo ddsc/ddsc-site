@@ -60,6 +60,8 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
     opacity = serializers.SerializerMethodField('get_opacity')
     type = serializers.SerializerMethodField('get_type')
 
+    options = serializers.SerializerMethodField('get_options')
+
     wms_url = serializers.Field('url')
 
     def get_wms_url(self, obj):
@@ -70,6 +72,10 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
         if isinstance(options, basestring):
             options = json.loads(options)
         return options['opacity']
+
+    def get_options(self, obj):
+        if isinstance(obj.options, basestring):
+            return json.loads(obj.options)
 
     def get_type(self, obj):
         return 'wms'
@@ -85,6 +91,7 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
 class FilteredGroupField(serializers.PrimaryKeyRelatedField):
     # keep this, so DRF generates a null choice!
     empty_label = '-------------'
+
     def initialize(self, *args, **kwargs):
         result = super(FilteredGroupField, self).initialize(*args, **kwargs)
         if 'request' in self.context:
@@ -94,9 +101,11 @@ class FilteredGroupField(serializers.PrimaryKeyRelatedField):
 
 class FilteredWorkspaceField(serializers.HyperlinkedRelatedField):
     def initialize(self, *args, **kwargs):
-        result = super(FilteredWorkspaceField, self).initialize(*args, **kwargs)
+        result = super(FilteredWorkspaceField, self
+                       ).initialize(*args, **kwargs)
         if 'request' in self.context:
-            self.queryset = filter_objects_for_creator(Workspace, self.context['request'].user, self.queryset)
+            self.queryset = filter_objects_for_creator(
+                Workspace, self.context['request'].user, self.queryset)
         return result
 
 
