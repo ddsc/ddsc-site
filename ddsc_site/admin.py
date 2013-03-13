@@ -15,8 +15,17 @@ class WorkspaceAdmin(admin.ModelAdmin):
         WorkspaceItemInline,
     ]
 
+class CollageItemInline(admin.TabularInline):
+    model = models.CollageItem
 
-admin.site.register(models.Collage)
+
+class CollageAdmin(admin.ModelAdmin):
+    inlines = [
+        CollageItemInline,
+    ]
+
+
+admin.site.register(models.Collage, CollageAdmin)
 admin.site.register(models.CollageItem)
 admin.site.register(models.Workspace, WorkspaceAdmin)
 admin.site.register(models.WorkspaceItem)

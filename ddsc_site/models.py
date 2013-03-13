@@ -45,7 +45,7 @@ class CollageItem(models.Model):
             timeseries_len = len(self.timeseries)
 
         return 'Collage: {}, Graph: {}, {} timeseries'.format(
-            self.collage, self.graph_id, timeseries_len)
+            self.collage, self.graph_index, timeseries_len)
 
 
 class Workspace(models.Model):
