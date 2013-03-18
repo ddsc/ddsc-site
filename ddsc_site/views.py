@@ -202,7 +202,7 @@ class WorkspaceList(generics.ListCreateAPIView):
 #            return self.serializer_class_list
 
 
-class WorkspaceDetail(FixedRetrieveUpdateDestroyAPIView):
+class WorkspaceDetail(generics.RetrieveUpdateDestroyAPIView): #FixedRetrieveUpdateDestroyAPIView):
     model = Workspace
     serializer_class = serializers.WorkspaceListSerializer
     filter_backend = WorkspaceCollageFilterBackend
@@ -223,7 +223,7 @@ class WorkspaceItemList(generics.ListCreateAPIView):
     )
 
 
-class WorkspaceItemDetail(FixedRetrieveUpdateDestroyAPIView):
+class WorkspaceItemDetail(generics.RetrieveUpdateDestroyAPIView): #FixedRetrieveUpdateDestroyAPIView):
     model = WorkspaceItem
     serializer_class = serializers.WorkspaceItemSerializer
     filter_field_prefix = 'workspace__'

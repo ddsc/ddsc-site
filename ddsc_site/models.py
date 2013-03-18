@@ -70,6 +70,8 @@ class WorkspaceItem(models.Model):
     order = models.IntegerField(default=0)
     wms_source = models.ForeignKey(WMSSource)
     visibility = models.BooleanField(default=True)
+    opacity = models.IntegerField(null=False, blank=False, default=100)
+    style = models.CharField(max_length=255, null=True, blank=True)
 
     class Meta:
         ordering = ('order',)
