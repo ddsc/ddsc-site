@@ -264,3 +264,18 @@ class CurrentAccount(APIView):
                              'last_name': ''}
                     }
         return Response(data)
+
+
+class AnnotationsSearchView(APIView):
+    def get(self, request, format=None):
+        pass
+
+
+class AnnotationsCountView(APIView):
+    def get(self, request, format=None):
+        pass
+
+
+class AnnotationsCreateView(APIView):
+    def post(self, request, format=None):
+        pass

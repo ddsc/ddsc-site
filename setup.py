@@ -15,6 +15,10 @@ install_requires = [
     'django-nose',
     'django-filter',
     'django-cors-headers',
+    'django-haystack >= 2.0.0-beta',
+    'geopy', # optional dependency of django-haystack
+    'pysolr', # optional dependency of django-haystack
+    'cssselect', # optional dependency of django-haystack
     'gunicorn',
     'lizard-map >= 4.13',
     'lizard-wms',

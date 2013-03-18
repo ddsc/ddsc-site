@@ -2,9 +2,12 @@
 from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 
+import datetime
+
 from django.db import models
 from django.contrib.auth.models import Group, User
-from django.contrib.gis.geos import GEOSGeometry
+from django.contrib.gis.geos import GEOSGeometry, Point
+from django.contrib.gis.db.models import PointField
 from lizard_wms.models import WMSSource
 
 from jsonfield.fields import JSONField
@@ -91,3 +94,66 @@ class ProxyHostname(models.Model):
 
     def __unicode__(self):
         return "ProxyHostname {0}, with name {1}".format(self.hostname, self.name)
+
+
+class Annotation(models.Model):
+    category = models.CharField(
+        max_length=255, null=True, blank=True,
+    )
+    text = models.TextField(
+        null=True, blank=True,
+    )
+    username = models.CharField(
+        max_length=255, null=True, blank=True,
+    )
+    picture_url = models.TextField(
+        max_length=2048, null=True, blank=True,
+    )
+    # Note: model_name is a reserved word for django-haystack!
+    the_model_name = models.CharField(
+        max_length=255, null=True, blank=True,
+    )
+    the_model_pk = models.CharField(
+        max_length=255, null=True, blank=True,
+    )
+    location = PointField(
+        srid=4258, null=True, blank=True
+    )
+    datetime_from = models.DateTimeField(
+        null=True, blank=True
+    )
+    datetime_until = models.DateTimeField(
+        null=True, blank=True
+    )
+    visibility = models.SmallIntegerField(
+        default=1, choices=VISIBILITY_CHOICES
+    )
+    tags = models.TextField(
+        null=True, blank=True,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True, editable=False
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True, editable=False
+    )
+
+    @staticmethod
+    def create_test_data():
+        for i in range(90):
+            a = Annotation()
+            a.category = 'ddsc'
+            a.text = 'text {0}'.format(i)
+            a.username = 'username {0}'.format(i)
+            a.picture_url = 'picture_url {0}'.format(i)
+            a.the_model_name = 'model_name {0}'.format(i)
+            a.the_model_pk = 'model_pk {0}'.format(i)
+            a.location = Point(100-i, i)
+            a.datetime_from = datetime.datetime.now()
+            a.datetime_until = datetime.datetime.now()
+            a.visibility = Visibility.PUBLIC
+            a.tags = 'tag1 tag2'
+            a.save()
+
+    def __unicode__(self):
+        return "Annotation {0}".format(self.pk)
