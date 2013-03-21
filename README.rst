@@ -38,15 +38,15 @@ For django-haystack, this is ``2.0.0-beta``. This module is current loaded strai
 its git repo using buildout auto-checkout.
 
 Apache Solr 3.6.2 is included in the subdirectory ``solr/``. This needs to be added as a webapp
-in tomcat6 using a config file (mind the two absolute paths):
+in tomcat6 using a config file (mind the two absolute paths)::
 
-``/etc/tomcat6/Catalina/localhost/solr.xml``
+``/etc/tomcat6/Catalina/localhost/solr.xml``::
 
     <Context docBase="/srv/dijkdata.nl/src/ddsc-site/solr/solr.war" debug="0" privileged="true" allowLinking="true" crossContext="true">
         <Environment name="solr/home" type="java.lang.String" value="/srv/dijkdata.nl/src/ddsc-site/solr" override="true" />
     </Context>
 
-The connection to Solr needs to be configured in your ``settings.py``:
+The connection to Solr needs to be configured in your ``settings.py``::
 
     HAYSTACK_CONNECTIONS = {
         'default': {
@@ -55,20 +55,20 @@ The connection to Solr needs to be configured in your ``settings.py``:
         },
     }
 
-When changing the Annotation model, the Solr schema needs updating as well:
+When changing the Annotation model, the Solr schema needs updating as well::
 
     $ bin/django build_solr_schema > src/ddsc-site/solr/conf/schema.xml
 
-When the index has to be rebuilt entirely:
+When the index has to be rebuilt entirely::
 
     $ bin/django rebuild_index
 
 When the index has to be rebuilt partially, for example in a cron job that runs each hour,
-you can do:
+you can do::
 
     $ bin/django update_index --age=1
 
-Searching annotations is easy:
+Searching annotations is easy::
 
     $ wget "http://api.dijkdata.nl/api/v0/annotations/count/?bbox=test&tags=tag2%20tag1&datetime_from=2013-03-21T14:46:46.000&datetime_until=2013-03-21T14:46:50.000"
     >> {"result": 17928}
@@ -96,9 +96,9 @@ Searching annotations is easy:
             },
             ...
         ]
-       }
+    }
 
-Possible ``GET`` parameters:
+Possible ``GET`` parameters::
 
 * ``category``: search in a category. Probably always 'ddsc'.
 * ``bbox``: comma-separated bounding box for the locations. Default WMS format, like, so "west,south,east,north". SRID 4258. When equal to "text", uses some fixed coordinates which are compatible with Annotation.create_test_data().
@@ -110,7 +110,7 @@ Possible ``GET`` parameters:
 * ``text``: fulltext search in the text of the annotation.
 * ``tags``: a set of space-separated tags to search.
 
-Create a set of test annotations:
+Create a set of test annotations::
 
     $ bin/django shell
     >> from ddsc_site.models import Annotation
