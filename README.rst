@@ -40,7 +40,7 @@ its git repo using buildout auto-checkout.
 Apache Solr 3.6.2 is included in the subdirectory ``solr/``. This needs to be added as a webapp
 in tomcat6 using a config file (mind the two absolute paths)::
 
-``/etc/tomcat6/Catalina/localhost/solr.xml``::
+``/etc/tomcat6/Catalina/localhost/solr.xml``
 
     <Context docBase="/srv/dijkdata.nl/src/ddsc-site/solr/solr.war" debug="0" privileged="true" allowLinking="true" crossContext="true">
         <Environment name="solr/home" type="java.lang.String" value="/srv/dijkdata.nl/src/ddsc-site/solr" override="true" />
@@ -100,15 +100,24 @@ Searching annotations is easy::
 
 Possible ``GET`` parameters::
 
-* ``category``: search in a category. Probably always 'ddsc'.
-* ``bbox``: comma-separated bounding box for the locations. Default WMS format, like, so "west,south,east,north". SRID 4258. When equal to "text", uses some fixed coordinates which are compatible with Annotation.create_test_data().
-* ``west,south,east,north``: alternative, if bbox isn't defined.
-* ``bottom_left,top_right``: alternative, if bbox isn't defined. Comma separated.
-* ``username_override``: only available in DEBUG mode. Test private/public annotation visibility with this.
-* ``model_name, model_pk``: search for annotations related to a specific model instance. For example a Timeseries with a specific UUID.
-* ``datetime_from, datetime_until``: search annotations in a specific time range. Takes any dateutil.parser compatible format, for example ISO8601: "2013-03-21T14:46:50.000".
-* ``text``: fulltext search in the text of the annotation.
-* ``tags``: a set of space-separated tags to search.
+category
+  Search in a category. Probably always 'ddsc'.
+bbox
+  Comma-separated bounding box for the locations. Default WMS format, like, so "west,south,east,north". SRID 4258. When equal to "text", uses some fixed coordinates which are compatible with Annotation.create_test_data().
+west,south,east,north
+  Alternative, if bbox isn't defined.
+bottom_left,top_right
+  Alternative, if bbox isn't defined. Comma separated.
+username_override
+  Only available in DEBUG mode. Test private/public annotation visibility with this.
+model_name, model_pk
+  Search for annotations related to a specific model instance. For example a Timeseries with a specific UUID.
+datetime_from, datetime_until
+  Search annotations in a specific time range. Takes any dateutil.parser compatible format, for example ISO8601: "2013-03-21T14:46:50.000".
+text
+  Fulltext search in the text of the annotation.
+tags
+  A set of space-separated tags to search.
 
 Create a set of test annotations::
 
