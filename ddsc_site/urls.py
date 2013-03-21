@@ -49,7 +49,6 @@ urlpatterns = patterns(
     url(r'^v0/annotations/search/$', views.AnnotationsSearchView.as_view(), name='annotations-search'),
     url(r'^v0/annotations/count/$',  views.AnnotationsCountView.as_view(),  name='annotations-count'),
     url(r'^v0/annotations/create/$', views.AnnotationsCreateView.as_view(), name='annotations-create'),
-    url(r'^search/', include('haystack.urls')),
     url(r'^', include('lizard_auth_client.urls')),
 )
 urlpatterns += debugmode_urlpatterns()

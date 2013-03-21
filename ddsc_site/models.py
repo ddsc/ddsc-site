@@ -3,6 +3,7 @@ from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 
 import datetime
+import random
 
 from django.db import models
 from django.contrib.auth.models import Group, User
@@ -136,13 +137,17 @@ class Annotation(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True, editable=False
     )
+    # Keep the following column (used in get_updated_field of the search index).
     updated_at = models.DateTimeField(
         auto_now=True, editable=False
     )
 
     @staticmethod
     def create_test_data():
-        for i in range(90):
+        Annotation.objects.delete()
+        length = 100000
+        tags = ['tag{0}'.format(i) for i in range(10)]
+        for i in range(length):
             a = Annotation()
             a.category = 'ddsc'
             a.text = 'text {0}'.format(i)
@@ -150,11 +155,11 @@ class Annotation(models.Model):
             a.picture_url = 'picture_url {0}'.format(i)
             a.the_model_name = 'model_name {0}'.format(i)
             a.the_model_pk = 'model_pk {0}'.format(i)
-            a.location = Point(100-i, i)
+            a.location = Point(-85 + (10 * i / length), 40 + (10 * i / length))
             a.datetime_from = datetime.datetime.now()
-            a.datetime_until = datetime.datetime.now()
+            a.datetime_until = datetime.datetime.now() + datetime.timedelta(hours=4)
             a.visibility = Visibility.PUBLIC
-            a.tags = 'tag1 tag2'
+            a.tags = '{0} {1}'.format(random.choice(tags), random.choice(tags))
             a.save()
 
     def __unicode__(self):

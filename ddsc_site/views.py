@@ -12,10 +12,14 @@ from django.core.exceptions import ImproperlyConfigured
 from django.views.decorators.gzip import gzip_page
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden
+from django.core.paginator import Paginator
 
 import requests
+from haystack.utils.geo import generate_bounding_box, Point
+from haystack.query import SQ, SearchQuerySet, RelatedSearchQuerySet
+import dateutil.parser
 
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, pagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -25,10 +29,19 @@ from ddsc_site import serializers
 from ddsc_site.filters import WorkspaceCollageFilterBackend
 from ddsc_site.permissions import IsCreatorOrReadOnly
 
-from .models import Collage, CollageItem, Workspace, WorkspaceItem, ProxyHostname
+from ddsc_site.models import (
+    Collage,
+    CollageItem,
+    Workspace,
+    WorkspaceItem,
+    ProxyHostname,
+    Annotation,
+    Visibility
+)
 
 
 logger = logging.getLogger(__name__)
+
 
 class FixedRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     '''
@@ -266,16 +279,100 @@ class CurrentAccount(APIView):
         return Response(data)
 
 
-class AnnotationsSearchView(APIView):
-    def get(self, request, format=None):
-        pass
+def filter_annotations(request, sqs):
+    # category
+    category = request.GET.get('category')
+    if category:
+        sqs = sqs.filter(category_exact=category)
+    # location
+    bbox = request.GET.get('bbox')
+    bottom_left = request.GET.get('bottom_left')
+    top_right = request.GET.get('top_right')
+    north = request.GET.get('north')
+    east = request.GET.get('east')
+    south = request.GET.get('south')
+    west = request.GET.get('west')
+    if bbox:
+        if bbox == 'test':
+            bottom_left = '-79.23592948913574', '43.97127105172941'
+            top_right = '-82.23592948913574', '46.97127105172941'
+        else:
+            # lon_min, lat_min, lon_max, lat_max
+            # west, south, east, north
+            x_min, y_min, x_max, y_max = bbox.split(',')
+            bottom_left = y_min, x_min
+            top_right = y_max, x_max
+    elif bottom_left and top_right:
+        bottom_left = bottom_left.split(',')
+        top_right = top_right.split(',')
+    elif north and east and south and west:
+        bottom_left = south, west
+        top_right = north, east
+    else:
+        bottom_left = None
+        top_right = None
+    if bottom_left and top_right:
+        bottom_left = Point(float(bottom_left[0]), float(bottom_left[1]))
+        top_right = Point(float(top_right[0]), float(top_right[1]))
+        sqs = sqs.within('location', bottom_left, top_right)
+    # user
+    username = request.user.username
+    # allow username overriding in DEBUG mode
+    # this is a possible security leak
+    username_override = request.GET.get('username_override')
+    if settings.DEBUG and username_override:
+        username = username_override
+    sqs = sqs.filter(
+        SQ(username__exact=username, visibility=Visibility.PRIVATE) |
+        SQ(visibility=Visibility.PUBLIC)
+    )
+    # relation to model instances
+    the_model_name = request.GET.get('model_name')
+    the_model_pk = request.GET.get('model_pk')
+    if the_model_name and the_model_pk:
+        sqs = sqs.filter(the_model_name__exact=the_model_name, the_model_pk__exact=the_model_pk)
+    # date range
+    datetime_from = request.GET.get('datetime_from')
+    if datetime_from:
+        datetime_from = dateutil.parser.parse(datetime_from)
+        sqs = sqs.filter(datetime_from__gte=datetime_from)
+    datetime_until = request.GET.get('datetime_until')
+    if datetime_until:
+        datetime_until = dateutil.parser.parse(datetime_until)
+        sqs = sqs.filter(datetime_until__lte=datetime_until)
+    # full text
+    text = request.GET.get('text')
+    if text:
+        sqs = sqs.filter(text__contains=text)
+    tags = request.GET.get('tags')
+    if tags:
+        sqs = sqs.filter(tags__contains=tags)
+
+    return sqs
+
+
+class AnnotationsSearchView(generics.ListAPIView):
+    model = Annotation
+    paginate_by = 10
+    paginate_by_param = None # disable user being able to customize page_size
+
+    def get_queryset(self):
+        sqs = SearchQuerySet().models(Annotation)
+        sqs = filter_annotations(self.request, sqs)
+        return sqs
 
 
 class AnnotationsCountView(APIView):
-    def get(self, request, format=None):
-        pass
+    def get(self, request, *args, **kwargs):
+        sqs = SearchQuerySet().models(Annotation)
+        sqs = filter_annotations(self.request, sqs)
+        result = {
+            'result': sqs.count()
+        }
+        return Response(result)
 
 
 class AnnotationsCreateView(APIView):
     def post(self, request, format=None):
+        # TODO: implement me
         pass

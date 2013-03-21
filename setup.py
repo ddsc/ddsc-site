@@ -19,6 +19,7 @@ install_requires = [
     'geopy', # optional dependency of django-haystack
     'pysolr', # optional dependency of django-haystack
     'cssselect', # optional dependency of django-haystack
+    'python-dateutil',
     'gunicorn',
     'lizard-map >= 4.13',
     'lizard-wms',
