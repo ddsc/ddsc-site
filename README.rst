@@ -32,10 +32,10 @@ Annotations
 -----------
 
 Annotations are indexed by the Apache Solr search engine using ``django-haystack``.
-Currently, the latest versions of these modules must be used to support spatial search.
+Currently, the latest versions of these modules must be used, to support spatial search.
 
 For django-haystack, this is ``2.0.0-beta``. This module is current loaded straight from
-its git repo using buildout auto-checkout.
+its git repo using buildout's ``auto-checkout``.
 
 Apache Solr 3.6.2 is included in the subdirectory ``solr/``. This needs to be added as a webapp
 in tomcat6 using a config file (mind the two absolute paths).
@@ -103,7 +103,7 @@ Possible ``GET`` parameters::
 category
   Search in a category. Probably always 'ddsc'.
 bbox
-  Comma-separated bounding box for the locations. Default WMS format, like, so "west,south,east,north". SRID 4258. When equal to "text", uses some fixed coordinates which are compatible with Annotation.create_test_data().
+  Comma-separated bounding box for the locations. Default WMS format, like, so "west,south,east,north". SRID 4258. When equal to "test", uses some fixed coordinates which are compatible with Annotation.create_test_data().
 west,south,east,north
   Alternative, if bbox isn't defined.
 bottom_left,top_right
