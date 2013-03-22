@@ -38,9 +38,9 @@ For django-haystack, this is ``2.0.0-beta``. This module is current loaded strai
 its git repo using buildout auto-checkout.
 
 Apache Solr 3.6.2 is included in the subdirectory ``solr/``. This needs to be added as a webapp
-in tomcat6 using a config file (mind the two absolute paths)::
+in tomcat6 using a config file (mind the two absolute paths).
 
-``/etc/tomcat6/Catalina/localhost/solr.xml``
+/etc/tomcat6/Catalina/localhost/solr.xml::
 
     <Context docBase="/srv/dijkdata.nl/src/ddsc-site/solr/solr.war" debug="0" privileged="true" allowLinking="true" crossContext="true">
         <Environment name="solr/home" type="java.lang.String" value="/srv/dijkdata.nl/src/ddsc-site/solr" override="true" />
