@@ -31,6 +31,9 @@ layers (those layers are copied from deltaportaal, btw)::
 Annotations
 -----------
 
+Solr
+~~~~
+
 Annotations are indexed by the Apache Solr search engine using ``django-haystack``.
 Currently, the latest versions of these modules must be used, to support spatial search.
 
@@ -55,6 +58,9 @@ The connection to Solr needs to be configured in your ``settings.py``::
         },
     }
 
+Schema and index
+~~~~~~~~~~~~~~~~
+
 When changing the Annotation model, the Solr schema needs updating as well::
 
     $ bin/django build_solr_schema > src/ddsc-site/solr/conf/schema.xml
@@ -63,10 +69,20 @@ When the index has to be rebuilt entirely::
 
     $ bin/django rebuild_index
 
-When the index has to be rebuilt partially, for example in a cron job that runs each hour,
+When the index can be rebuilt partially, for example in a cron job that runs each hour,
 you can do::
 
     $ bin/django update_index --age=1
+
+A cronjob doing exactly this is already configured for ddsc-site and ddsc-api. The last update time of
+an Annotation is determined by its ``updated_at`` column, which is marked ``auto_now=True``.
+
+For development scenario's, instant updating of the index is enabled in developmentsettings.py::
+
+    HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+Queries
+~~~~~~~
 
 Searching annotations is easy::
 
@@ -86,7 +102,7 @@ Searching annotations is easy::
                 "picture_url": "picture_url 45343",
                 "the_model_name": "model_name 45343",
                 "the_model_pk": "model_pk 45343",
-                "location": "POINT (-80.4656999999999982 44.5343000000000018)",
+                "location": [-80.4656999999999982, 44.5343000000000018],
                 "datetime_from": "2013-03-21T14:46:46",
                 "datetime_until": "2013-03-21T14:46:46",
                 "visibility": "3",

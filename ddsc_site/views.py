@@ -353,6 +353,7 @@ def filter_annotations(request, sqs):
 
 class AnnotationsSearchView(generics.ListAPIView):
     model = Annotation
+    serializer_class = serializers.AnnotationSerializer
     paginate_by = 10
     paginate_by_param = None # disable user being able to customize page_size
 

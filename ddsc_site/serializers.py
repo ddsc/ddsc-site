@@ -3,7 +3,7 @@ import json
 from rest_framework import serializers
 
 from lizard_wms.models import WMSSource
-from .models import Collage, CollageItem, Workspace, WorkspaceItem
+from .models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation
 
 from ddsc_site.filters import filter_objects_for_creator
 
@@ -124,3 +124,19 @@ class WorkspaceListSerializer(HyperlinkedIdModelSerializer):
     class Meta:
         model = Workspace
         exclude = ('creator',)
+
+
+class PointField(serializers.Field):
+    def to_native(self, obj):
+        return obj.coords
+
+
+class AnnotationSerializer(serializers.ModelSerializer):
+    location = PointField(source='location')
+
+    def to_native(self, obj):
+        # use the database object instead of the search index result
+        return super(AnnotationSerializer, self).to_native(obj.object)
+
+    class Meta:
+        model = Annotation
