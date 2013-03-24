@@ -49,7 +49,10 @@ Create a symlink from your Tomcat 6 config dir to the generated config::
     $ ln -s /srv/api.dijkdata.nl/etc/solr.xml /etc/tomcat6/Catalina/localhost/solr.xml
 
 The config file points to Solr to ``/srv/api.dijkdata.nl/etc/solr``, which in turn refers to
-``/srv/api.dijkdata.nl/var/solrdata`` using a properties file. This directory contains the actual index.
+``/srv/api.dijkdata.nl/var/solr`` using a properties file. This directory contains the actual index, and needs
+to be writable by Solr / Tomcat:
+
+    sudo chown -R tomcat6.tomcat6 /srv/api.dijkdata.nl/var/solr
 
 The connection to Solr needs to be configured in your ``settings.py``::
 
