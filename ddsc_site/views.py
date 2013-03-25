@@ -283,7 +283,7 @@ def filter_annotations(request, sqs):
     # category
     category = request.GET.get('category')
     if category:
-        sqs = sqs.filter(category_exact=category)
+        sqs = sqs.filter(category__exact=category)
     # location
     bbox = request.GET.get('bbox')
     bottom_left = request.GET.get('bottom_left')
@@ -354,8 +354,9 @@ def filter_annotations(request, sqs):
 class AnnotationsSearchView(generics.ListAPIView):
     model = Annotation
     serializer_class = serializers.AnnotationSerializer
-    paginate_by = 10
-    paginate_by_param = None # disable user being able to customize page_size
+    # effectively disable pagination,
+    # but stick to the same response format
+    paginate_by = 10000
 
     def get_queryset(self):
         sqs = SearchQuerySet().models(Annotation)
@@ -368,7 +369,7 @@ class AnnotationsCountView(APIView):
         sqs = SearchQuerySet().models(Annotation)
         sqs = filter_annotations(self.request, sqs)
         result = {
-            'result': sqs.count()
+            'count': sqs.count()
         }
         return Response(result)
 

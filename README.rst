@@ -47,12 +47,13 @@ it's better to use that instead.
 Create a symlink from your Tomcat 6 config dir to the generated config::
 
     $ ln -s /srv/api.dijkdata.nl/etc/solr.xml /etc/tomcat6/Catalina/localhost/solr.xml
+    $ service tomcat6 restart
 
 The config file points to Solr to ``/srv/api.dijkdata.nl/etc/solr``, which in turn refers to
 ``/srv/api.dijkdata.nl/var/solr`` using a properties file. This directory contains the actual index, and needs
 to be writable by Solr / Tomcat:
 
-    sudo chown -R tomcat6.tomcat6 /srv/api.dijkdata.nl/var/solr
+    $ sudo chown -R tomcat6.tomcat6 /srv/api.dijkdata.nl/var/solr
 
 The connection to Solr needs to be configured in your ``settings.py``::
 
@@ -82,7 +83,8 @@ you can do::
 A cronjob doing exactly this is already configured for ddsc-site and ddsc-api. The last update time of
 an Annotation is determined by its ``updated_at`` column, which is marked ``auto_now=True``.
 
-For development scenario's, instant updating of the index is enabled in developmentsettings.py::
+For now, instant updating of the index is enabled in ``settings.py``, at the cost of a tiny performance hit when
+creating annotations::
 
     HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 

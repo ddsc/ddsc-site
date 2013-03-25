@@ -6,6 +6,7 @@ import datetime
 import random
 
 from django.db import models
+from django.conf import settings
 from django.contrib.auth.models import Group, User
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.db.models import PointField
@@ -120,7 +121,7 @@ class Annotation(models.Model):
         max_length=255, null=True, blank=True,
     )
     location = PointField(
-        srid=4258, null=True, blank=True
+        srid=4326, null=True, blank=True
     )
     datetime_from = models.DateTimeField(
         null=True, blank=True
@@ -144,23 +145,30 @@ class Annotation(models.Model):
 
     @staticmethod
     def create_test_data():
-        Annotation.objects.delete()
-        length = 100000
+        Annotation.objects.all().delete()
+        x_length = 20
+        y_length = 20
         tags = ['tag{0}'.format(i) for i in range(10)]
-        for i in range(length):
-            a = Annotation()
-            a.category = 'ddsc'
-            a.text = 'text {0}'.format(i)
-            a.username = 'username {0}'.format(i)
-            a.picture_url = 'picture_url {0}'.format(i)
-            a.the_model_name = 'model_name {0}'.format(i)
-            a.the_model_pk = 'model_pk {0}'.format(i)
-            a.location = Point(-85 + (10 * i / length), 40 + (10 * i / length))
-            a.datetime_from = datetime.datetime.now()
-            a.datetime_until = datetime.datetime.now() + datetime.timedelta(hours=4)
-            a.visibility = Visibility.PUBLIC
-            a.tags = '{0} {1}'.format(random.choice(tags), random.choice(tags))
-            a.save()
+        for x in range(x_length):
+            for y in range(y_length):
+                i = x * y
+                a = Annotation()
+                a.category = 'ddsc'
+                a.text = 'text {0}'.format(i)
+                a.username = 'username {0}'.format(i)
+                a.picture_url = 'picture_url {0}'.format(i)
+                a.the_model_name = 'model_name {0}'.format(i)
+                a.the_model_pk = 'model_pk {0}'.format(i)
+                a.location = Point(
+                    55 - (10 * y / y_length),
+                    2 + (10 * x / x_length),
+                    srid=4326
+                )
+                a.datetime_from = datetime.datetime.now()
+                a.datetime_until = datetime.datetime.now() + datetime.timedelta(hours=4)
+                a.visibility = Visibility.PUBLIC
+                a.tags = '{0} {1}'.format(random.choice(tags), random.choice(tags))
+                a.save()
 
     def __unicode__(self):
         return "Annotation {0}".format(self.pk)
