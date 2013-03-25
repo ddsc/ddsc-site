@@ -146,8 +146,8 @@ class Annotation(models.Model):
     @staticmethod
     def create_test_data():
         Annotation.objects.all().delete()
-        x_length = 20
-        y_length = 20
+        x_length = 10
+        y_length = 10
         tags = ['tag{0}'.format(i) for i in range(10)]
         for x in range(x_length):
             for y in range(y_length):
