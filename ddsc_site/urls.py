@@ -14,41 +14,41 @@ admin.autodiscover()
 urlpatterns = patterns(
     '',
 
-    url(r'^v0/collages/?$', views.CollageList.as_view(), name='collage-list'),
-    url(r'^v0/collages/(?P<pk>\d+)/?$', views.CollageDetail.as_view(),
+    url(r'^v1/collages/?$', views.CollageList.as_view(), name='collage-list'),
+    url(r'^v1/collages/(?P<pk>\d+)/?$', views.CollageDetail.as_view(),
         name='collage-detail'),
 
-    url(r'^v0/collageitems/?$', views.CollageItemList.as_view(),
+    url(r'^v1/collageitems/?$', views.CollageItemList.as_view(),
         name='collageitem-list'),
-    url(r'^v0/collageitems/(?P<pk>\d+)/?$',
+    url(r'^v1/collageitems/(?P<pk>\d+)/?$',
         views.CollageItemDetail.as_view(),
         name='collageitem-detail'),
 
-    url(r'^v0/workspaces/?$', views.WorkspaceList.as_view(), name='workspace-list'),
-    url(r'^v0/workspaces/(?P<pk>\d+)/?$', views.WorkspaceDetail.as_view(),
+    url(r'^v1/workspaces/?$', views.WorkspaceList.as_view(), name='workspace-list'),
+    url(r'^v1/workspaces/(?P<pk>\d+)/?$', views.WorkspaceDetail.as_view(),
         name='workspace-detail'),
 
-    url(r'^v0/workspaceitems/?$', views.WorkspaceItemList.as_view(),
+    url(r'^v1/workspaceitems/?$', views.WorkspaceItemList.as_view(),
         name='workspaceitem-list'),
-    url(r'^v0/workspaceitems/(?P<pk>\d+)/?$',
+    url(r'^v1/workspaceitems/(?P<pk>\d+)/?$',
         views.WorkspaceItemDetail.as_view(),
         name='workspaceitem-detail'),
 
-    url(r'^v0/layers/?$', views.LayerList.as_view(), name='layer-list'),
-    url(r'^v0/layers/(?P<pk>\d+)/?$', views.LayerDetail.as_view(),
+    url(r'^v1/layers/?$', views.LayerList.as_view(), name='layer-list'),
+    url(r'^v1/layers/(?P<pk>\d+)/?$', views.LayerDetail.as_view(),
         name='layer-detail'),
 
-    url(r'^v0/account/?$', views.CurrentAccount.as_view(), name='account'),
-    url(r'^v0/account/login-url/?$', LoginApiView.as_view(),
+    url(r'^v1/account/?$', views.CurrentAccount.as_view(), name='account'),
+    url(r'^v1/account/login-url/?$', LoginApiView.as_view(),
         name='ddsc_site.sso-login'),
-    url(r'^v0/account/logout-url/?$', LogoutApiView.as_view(),
+    url(r'^v1/account/logout-url/?$', LogoutApiView.as_view(),
         name='ddsc_site.sso-logout'),
 
-    url(r'^v0/proxy/?$', views.ProxyView.as_view(), name='proxy'),
+    url(r'^v1/proxy/?$', views.ProxyView.as_view(), name='proxy'),
 
-    url(r'^v0/annotations/search/$', views.AnnotationsSearchView.as_view(), name='annotations-search'),
-    url(r'^v0/annotations/count/$',  views.AnnotationsCountView.as_view(),  name='annotations-count'),
-    url(r'^v0/annotations/create/$', views.AnnotationsCreateView.as_view(), name='annotations-create'),
+    url(r'^v1/annotations/search/$', views.AnnotationsSearchView.as_view(), name='annotations-search'),
+    url(r'^v1/annotations/count/$',  views.AnnotationsCountView.as_view(),  name='annotations-count'),
+    url(r'^v1/annotations/create/$', views.AnnotationsCreateView.as_view(), name='annotations-create'),
     url(r'^', include('lizard_auth_client.urls')),
 )
 urlpatterns += debugmode_urlpatterns()
