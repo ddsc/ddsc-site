@@ -154,11 +154,11 @@ class Annotation(models.Model):
                 i = x * y
                 a = Annotation()
                 a.category = 'ddsc'
-                a.text = 'text {0}'.format(i)
-                a.username = 'username {0}'.format(i)
-                a.picture_url = 'picture_url {0}'.format(i)
-                a.the_model_name = 'model_name {0}'.format(i)
-                a.the_model_pk = 'model_pk {0}'.format(i)
+                a.text = 'text {0} blah'.format(i)
+                a.username = 'username{0}'.format(i)
+                a.picture_url = 'http://www.nelen-schuurmans.nl/images/476/0/2/0/58.jpg'
+                a.the_model_name = 'model_name{0}'.format(x)
+                a.the_model_pk = 'model_pk{0}'.format(y)
                 a.location = Point(
                     55 - (10 * y / y_length),
                     2 + (10 * x / x_length),

@@ -93,12 +93,12 @@ Queries
 
 Searching annotations is easy::
 
-    $ wget "http://api.dijkdata.nl/api/v0/annotations/count/?bbox=test&tags=tag2%20tag1&datetime_from=2013-03-21T14:46:46.000&datetime_until=2013-03-21T14:46:50.000"
-    >> {"result": 17928}
-    $ wget "http://api.dijkdata.nl/api/v0/annotations/search/?bbox=test&tags=tag2%20tag1&datetime_from=2013-03-21T14:46:46.000&datetime_until=2013-03-21T14:46:50.000"
+    $ wget "http://api.dijkdata.nl/api/v1/annotations/count/?bbox=test&tags=tag2%20tag1&datetime_from=2013-03-21T14:46:46.000&datetime_until=2013-03-21T14:46:50.000"
+    >> {"count": 17928}
+    $ wget "http://api.dijkdata.nl/api/v1/annotations/search/?bbox=test&tags=tag2%20tag1&datetime_from=2013-03-21T14:46:46.000&datetime_until=2013-03-21T14:46:50.000"
     >> {
         "count": 774,
-        "next": "http://api.dijkdata.nl/api/v0/annotations/search/?datetime_from=2013-03-21T14%3A46%3A46.000&datetime_until=2013-03-21T14%3A46%3A50.000&tags=tag2+tag1&bbox=test&page=2&username_override=username+99975",
+        "next": "http://api.dijkdata.nl/api/v1/annotations/search/?datetime_from=2013-03-21T14%3A46%3A46.000&datetime_until=2013-03-21T14%3A46%3A50.000&tags=tag2+tag1&bbox=test&page=2&username_override=username+99975",
         "previous": null,
         "results": [
             {
@@ -120,13 +120,16 @@ Searching annotations is easy::
             ...
         ]
     }
+    $ wget "http://api.dijkdata.nl/api/v1/annotations/count/?model_names_pks=model_name0%2Cmodel_pk5%3bmodel_name1%2Cmodel_pk2
+    >> {"count": 2}
 
 Possible ``GET`` parameters::
 
 category
   Search in a category. Probably always 'ddsc'.
 bbox
-  Comma-separated bounding box for the locations. Default WMS format, like, so "west,south,east,north". SRID 4258. When equal to "test", uses some fixed coordinates which are compatible with Annotation.create_test_data().
+  Comma-separated bounding box for the locations. Default WMS format, like, so "west,south,east,north". SRID 4326 (a.k.a. WGS 84).
+  When equal to "test", uses some fixed coordinates which are compatible with Annotation.create_test_data().
 west,south,east,north
   Alternative, if bbox isn't defined.
 bottom_left,top_right
@@ -135,6 +138,11 @@ username_override
   Only available in DEBUG mode. Test private/public annotation visibility with this.
 model_name, model_pk
   Search for annotations related to a specific model instance. For example a Timeseries with a specific UUID.
+model_names_pks
+  Search for annotations related to a whole set of model instances.
+  Separate different pairs of model name and PK with a semi-colon (';', or %3B in url encoding).
+  Separate model name and PK with a comma (',', or %2C in url encoding).
+  For example, ``model_names_pks=location%2C54%3Btimeseries%2Csome-uuid-here``.
 datetime_from, datetime_until
   Search annotations in a specific time range. Takes any dateutil.parser compatible format, for example ISO8601: "2013-03-21T14:46:50.000".
 text

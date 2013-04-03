@@ -294,8 +294,8 @@ def filter_annotations(request, sqs):
     west = request.GET.get('west')
     if bbox:
         if bbox == 'test':
-            bottom_left = '-79.23592948913574', '43.97127105172941'
-            top_right = '-82.23592948913574', '46.97127105172941'
+            bottom_left = '48.0', '4.0'
+            top_right = '52.0', '10.0'
         else:
             # lon_min, lat_min, lon_max, lat_max
             # west, south, east, north
@@ -323,7 +323,9 @@ def filter_annotations(request, sqs):
     if settings.DEBUG and username_override:
         username = username_override
     sqs = sqs.filter(
+        # either private and linked to the current user
         SQ(username__exact=username, visibility=Visibility.PRIVATE) |
+        # or public
         SQ(visibility=Visibility.PUBLIC)
     )
     # relation to model instances
@@ -331,6 +333,16 @@ def filter_annotations(request, sqs):
     the_model_pk = request.GET.get('model_pk')
     if the_model_name and the_model_pk:
         sqs = sqs.filter(the_model_name__exact=the_model_name, the_model_pk__exact=the_model_pk)
+    else:
+        # allow multiple models and pks
+        model_names_pks = request.GET.get('model_names_pks')
+        if model_names_pks:
+            model_names_pks = model_names_pks.split(';')
+            sq = SQ()
+            for model_name_pk in model_names_pks:
+                model_name, model_pk = model_name_pk.split(',')
+                sq.add(SQ(the_model_name__exact=model_name, the_model_pk__exact=model_pk), SQ.OR)
+            sqs = sqs.filter(sq)
     # date range
     datetime_from = request.GET.get('datetime_from')
     if datetime_from:
