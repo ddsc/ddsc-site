@@ -70,12 +70,18 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
     def get_opacity(self, obj):
         options = obj.options
         if isinstance(options, basestring):
-            options = json.loads(options)
-        return options['opacity']
+            try:
+                options = json.loads(options)
+            except ValueError:
+                options = {}
+        return getattr(options, 'opacity', None)
 
     def get_options(self, obj):
         if isinstance(obj.options, basestring):
-            return json.loads(obj.options)
+            try:
+                return json.loads(obj.options)
+            except ValueError:
+                return {}
 
     def get_type(self, obj):
         return 'wms'
