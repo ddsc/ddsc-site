@@ -139,9 +139,10 @@ class PointField(serializers.Field):
 
 class AnnotationSerializer(serializers.ModelSerializer):
     location = PointField(source='location')
+    related_model_str = serializers.CharField(source='get_related_model_str')
 
     def to_native(self, obj):
-        # use the database object instead of the search index result
+        # use the Postgres database object, instead of the search index result
         return super(AnnotationSerializer, self).to_native(obj.object)
 
     class Meta:

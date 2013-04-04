@@ -6,7 +6,9 @@ import datetime
 import random
 
 from django.db import models
+from django.db.models.loading import get_model
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.contrib.auth.models import Group, User
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.db.models import PointField
@@ -149,6 +151,8 @@ class Annotation(models.Model):
         x_length = 10
         y_length = 10
         tags = ['tag{0}'.format(i) for i in range(10)]
+        model_names = ['location', 'timeseries']
+        picture_urls = [None, 'http://www.nelen-schuurmans.nl/images/476/0/2/0/58.jpg']
         for x in range(x_length):
             for y in range(y_length):
                 i = x * y
@@ -156,9 +160,9 @@ class Annotation(models.Model):
                 a.category = 'ddsc'
                 a.text = 'text {0} blah'.format(i)
                 a.username = 'username{0}'.format(i)
-                a.picture_url = 'http://www.nelen-schuurmans.nl/images/476/0/2/0/58.jpg'
-                a.the_model_name = 'model_name{0}'.format(x)
-                a.the_model_pk = 'model_pk{0}'.format(y)
+                a.picture_url = random.choice(picture_urls)
+                a.the_model_name = random.choice(model_names)
+                a.the_model_pk = '{0}'.format(y)
                 a.location = Point(
                     55 - (10 * y / y_length),
                     2 + (10 * x / x_length),
@@ -169,6 +173,31 @@ class Annotation(models.Model):
                 a.visibility = Visibility.PUBLIC
                 a.tags = '{0} {1}'.format(random.choice(tags), random.choice(tags))
                 a.save()
+
+    def find_model(self):
+        if self.the_model_name and self.the_model_pk:
+            app_label = 'ddsc_core'
+            # find the Model class
+            model = get_model(app_label, self.the_model_name)
+            return model
+
+    def get_related_model(self):
+        model = self.find_model()
+        if model:
+            try:
+                model_instance = model.objects.get(pk=self.the_model_pk)
+            except model.DoesNotExist as ex:
+                model_instance = None
+            return model_instance
+
+    def get_related_model_str(self):
+        model_instance = self.get_related_model()
+        if model_instance:
+            return str(model_instance)
+
+    def clean(self):
+        if self.the_model_name not in ['location', 'timeseries']:
+            raise ValidationError('Model %s not supported for annotations.', self.the_model_name)
 
     def __unicode__(self):
         return "Annotation {0}".format(self.pk)
