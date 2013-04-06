@@ -170,6 +170,7 @@ CORS_ORIGIN_WHITELIST = (
 
 WEBCLIENT = 'http://dijkdata.nl'
 
+AUTH_PROFILE_MODULE = 'ddsc_site.UserProfile'
 
 SKIP_SOUTH_TESTS = True
 SOUTH_TESTS_MIGRATE = False

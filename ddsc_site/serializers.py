@@ -192,8 +192,9 @@ class AnnotationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Annotation
 
+
 class AnnotationCreateSerializer(serializers.ModelSerializer):
-    category = serializers.CharField(required=False)
+    category = serializers.CharField(required=False, default='ddsc')
     text = serializers.CharField(required=False, widget=widgets.Textarea)
     picture_url = serializers.CharField(required=False)
     the_model_name = serializers.CharField(required=False)

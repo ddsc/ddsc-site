@@ -24,6 +24,9 @@ class CollageAdmin(admin.ModelAdmin):
         CollageItemInline,
     ]
 
+class UserProfileAdmin(admin.ModelAdmin):
+    model = models.UserProfile
+admin.site.register(models.UserProfile, UserProfileAdmin)
 
 admin.site.register(models.Collage, CollageAdmin)
 admin.site.register(models.CollageItem)

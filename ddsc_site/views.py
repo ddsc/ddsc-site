@@ -36,7 +36,8 @@ from ddsc_site.models import (
     WorkspaceItem,
     ProxyHostname,
     Annotation,
-    Visibility
+    Visibility,
+    UserProfile
 )
 
 
@@ -282,25 +283,41 @@ class LayerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CurrentAccount(APIView):
+    authentication_classes = (FixedSessionAuthentication,)
+
     def get(self, request, format=None):
         """
         Return account information.
         """
+        initial_period = '1m'
 
         if request.user.is_authenticated():
             user = request.user
+            profile = user.get_profile()
             data = {'authenticated': True,
                     'user': {'username': user.username,
                              'first_name': user.first_name,
-                             'last_name': user.last_name}
+                             'last_name': user.last_name},
+                    'initialPeriod': profile.initial_period
                     }
-
         else:
             data = {'authenticated': False,
-                    'user': {'username': '',
-                             'first_name': '',
-                             'last_name': ''}
+                    'user': {'username': 'n.v.t.',
+                             'first_name': 'n.v.t.',
+                             'last_name': 'n.v.t.'},
+                    'initialPeriod': initial_period
                     }
+        return Response(data)
+
+    def post(self, request, format=None):
+        data = {'result': 'ignored'}
+        if request.user.is_authenticated():
+            user = request.user
+            profile = user.get_profile()
+            if profile:
+                profile.initial_period = request.DATA.get('initialPeriod')
+                profile.save()
+                data = {'result': 'ok'}
         return Response(data)
 
 

@@ -12,6 +12,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import Group, User
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.db.models import PointField
+from django.db.models.signals import post_save
+
 from lizard_wms.models import WMSSource
 
 from jsonfield.fields import JSONField
@@ -208,3 +210,37 @@ class Annotation(models.Model):
 
     def __unicode__(self):
         return "Annotation {0}".format(self.pk)
+
+
+class UserProfileManager(models.Manager):
+    def fetch_for_user(self, user):
+        if not user:
+            raise AttributeError('Cant get UserProfile without user')
+        return self.get(user=user)
+
+
+class UserProfile(models.Model):
+    user = models.OneToOneField(User)
+    initial_period = models.CharField(max_length=16, null=True, blank=True, default='1m')
+
+    objects = UserProfileManager()
+
+    def clean(self):
+        valid_periods = ['24h', '48h', '1w', '1m', '1y']
+        if self.initial_period not in valid_periods:
+            raise ValidationError('Period "{}" is not a valid period; pick one of "{}"'.format(self.initial_period, valid_periods))
+
+    def __unicode__(self):
+        if self.user:
+            return 'UserProfile {} ({}, {})'.format(self.pk, self.user, self.user.email)
+        else:
+            return 'UserProfile {}'.format(self.pk)
+
+
+# have the creation of a User trigger the creation of a Profile
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+
+
+post_save.connect(create_user_profile, sender=User)
