@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 from lizard_wms.models import WMSSource
 
-from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation
+from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation, Visibility
 from ddsc_site.filters import filter_objects_for_creator
 
 
@@ -137,10 +137,12 @@ class WorkspaceListSerializer(HyperlinkedIdModelSerializer):
 
 
 class PointField(serializers.WritableField):
+    # to json
     def to_native(self, obj):
         if obj:
             return obj.coords
 
+    # from json
     def from_native(self, obj):
         if obj:
             if isinstance(obj, basestring):
@@ -156,6 +158,27 @@ class PointField(serializers.WritableField):
                 except Exception as ex:
                     raise ValidationError('location must be an array of floats: {0}'.format(ex))
                 return Point(x, y)
+
+
+class VisibilityField(serializers.ChoiceField):
+    # to json
+    def to_native(self, obj):
+        vis2str = {
+            Visibility.PUBLIC: 'public',
+            Visibility.PRIVATE: 'private',
+        }
+        return vis2str.get(obj)
+
+    # from json
+    def from_native(self, obj):
+        result = None
+        if isinstance(obj, basestring):
+            str2vis = {
+                'public': Visibility.PUBLIC,
+                'private': Visibility.PRIVATE,
+            }
+            result = str2vis.get(obj)
+        return result if result is not None else super(VisibilityField, self).from_native(obj)
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
@@ -179,7 +202,7 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
     datetime_from = serializers.DateTimeField(required=False)
     datetime_until = serializers.DateTimeField(required=False)
     tags = serializers.CharField(required=False, widget=widgets.Textarea)
-    visibility = serializers.ChoiceField(required=True, choices=Annotation._meta.get_field_by_name('visibility')[0].choices)
+    visibility = VisibilityField(required=True, choices=((Visibility.PRIVATE, 'private'), (Visibility.PUBLIC, 'public')))
     username = serializers.Field()
 
     class Meta:

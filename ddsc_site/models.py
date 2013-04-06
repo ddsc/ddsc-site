@@ -196,7 +196,7 @@ class Annotation(models.Model):
             return str(model_instance)
 
     def clean(self):
-        # Following won't work: DjangoRestFrameWork only supplies a pre_save method.
+        # Following won't work: DjangoRestFramework only supplies a pre_save method.
         # This is called AFTER model.is_valid(), which is what runs this model.clean() method.
         #if not self.username:
         #    raise ValidationError('No username supplied.')
