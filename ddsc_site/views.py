@@ -13,6 +13,7 @@ from django.views.decorators.gzip import gzip_page
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden
 from django.core.paginator import Paginator
+from django.core.exceptions import ValidationError
 
 import requests
 from haystack.utils.geo import generate_bounding_box, Point
@@ -293,7 +294,7 @@ class CurrentAccount(APIView):
 
         if request.user.is_authenticated():
             user = request.user
-            profile = user.get_profile()
+            profile = UserProfile.get_or_create_profile(user)
             data = {'authenticated': True,
                     'user': {'username': user.username,
                              'first_name': user.first_name,
@@ -309,16 +310,25 @@ class CurrentAccount(APIView):
                     }
         return Response(data)
 
+
     def post(self, request, format=None):
-        data = {'result': 'ignored'}
         if request.user.is_authenticated():
             user = request.user
-            profile = user.get_profile()
-            if profile:
-                profile.initial_period = request.DATA.get('initialPeriod')
+            profile = UserProfile.get_or_create_profile(user)
+            profile.initial_period = request.DATA.get('initialPeriod')
+            try:
+                profile.full_clean()
                 profile.save()
+            except ValidationError as ex:
+                data = {'result': 'error', 'detail': '; '.join(ex.messages)}
+                status = 400
+            else:
                 data = {'result': 'ok'}
-        return Response(data)
+                status = 200
+        else:
+            data = {'result': 'error', 'detail': 'not logged in'}
+            status = 400
+        return Response(data, status=status)
 
 
 def filter_annotations(request, sqs):

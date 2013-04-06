@@ -236,6 +236,13 @@ class UserProfile(models.Model):
         else:
             return 'UserProfile {}'.format(self.pk)
 
+    @staticmethod
+    def get_or_create_profile(user):
+        """
+        Return the UserProfile for the given user, creating one if it does not exist.
+        """
+        profile, c = UserProfile.objects.get_or_create(user=user)
+        return profile
 
 # have the creation of a User trigger the creation of a Profile
 def create_user_profile(sender, instance, created, **kwargs):
