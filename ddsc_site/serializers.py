@@ -2,9 +2,13 @@ import json
 
 from rest_framework import serializers
 
-from lizard_wms.models import WMSSource
-from .models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation
+from django.forms import widgets
+from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
 
+from lizard_wms.models import WMSSource
+
+from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation
 from ddsc_site.filters import filter_objects_for_creator
 
 
@@ -132,9 +136,26 @@ class WorkspaceListSerializer(HyperlinkedIdModelSerializer):
         exclude = ('creator',)
 
 
-class PointField(serializers.Field):
+class PointField(serializers.WritableField):
     def to_native(self, obj):
-        return obj.coords
+        if obj:
+            return obj.coords
+
+    def from_native(self, obj):
+        if obj:
+            if isinstance(obj, basestring):
+                try:
+                    obj = obj.split(',')
+                    x, y = float(obj[0]), float(obj[1])
+                except Exception as ex:
+                    raise ValidationError('location must be a comma separated pair of coordinates: {0}'.format(ex))
+                return Point(x, y)
+            elif isinstance(lst, (list, tuple)):
+                try:
+                    x, y = float(obj[0]), float(obj[1])
+                except Exception as ex:
+                    raise ValidationError('location must be an array of floats: {0}'.format(ex))
+                return Point(x, y)
 
 
 class AnnotationSerializer(serializers.ModelSerializer):
@@ -144,6 +165,22 @@ class AnnotationSerializer(serializers.ModelSerializer):
     def to_native(self, obj):
         # use the Postgres database object, instead of the search index result
         return super(AnnotationSerializer, self).to_native(obj.object)
+
+    class Meta:
+        model = Annotation
+
+class AnnotationCreateSerializer(serializers.ModelSerializer):
+    category = serializers.CharField(required=False)
+    text = serializers.CharField(required=False, widget=widgets.Textarea)
+    picture_url = serializers.CharField(required=False)
+    the_model_name = serializers.CharField(required=False)
+    the_model_pk = serializers.CharField(required=False)
+    location = PointField(required=False)
+    datetime_from = serializers.DateTimeField(required=False)
+    datetime_until = serializers.DateTimeField(required=False)
+    tags = serializers.CharField(required=False, widget=widgets.Textarea)
+    visibility = serializers.ChoiceField(required=True, choices=Annotation._meta.get_field_by_name('visibility')[0].choices)
+    username = serializers.Field()
 
     class Meta:
         model = Annotation

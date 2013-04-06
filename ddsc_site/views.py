@@ -386,7 +386,10 @@ class AnnotationsCountView(APIView):
         return Response(result)
 
 
-class AnnotationsCreateView(APIView):
-    def post(self, request, format=None):
-        # TODO: implement me
-        pass
+class AnnotationsCreateView(generics.CreateAPIView):
+    model = Annotation
+    serializer_class = serializers.AnnotationCreateSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def pre_save(self, obj):
+        obj.username = self.request.user.username

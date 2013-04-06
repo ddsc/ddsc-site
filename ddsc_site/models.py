@@ -196,8 +196,15 @@ class Annotation(models.Model):
             return str(model_instance)
 
     def clean(self):
-        if self.the_model_name not in ['location', 'timeseries']:
-            raise ValidationError('Model %s not supported for annotations.', self.the_model_name)
+        # Following won't work: DjangoRestFrameWork only supplies a pre_save method.
+        # This is called AFTER model.is_valid(), which is what runs this model.clean() method.
+        #if not self.username:
+        #    raise ValidationError('No username supplied.')
+        if self.the_model_name:
+            if self.the_model_name not in ['location', 'timeseries']:
+                raise ValidationError('Model "{0}" not supported for annotations.'.format(self.the_model_name))
+        if self.the_model_name is None and self.the_model_pk:
+            raise ValidationError('Model PK is supplied, but no model name given.')
 
     def __unicode__(self):
         return "Annotation {0}".format(self.pk)
