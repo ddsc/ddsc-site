@@ -13,14 +13,13 @@ from django.views.decorators.gzip import gzip_page
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden
 from django.core.paginator import Paginator
-from django.views.decorators.csrf import csrf_exempt
 
 import requests
 from haystack.utils.geo import generate_bounding_box, Point
 from haystack.query import SQ, SearchQuerySet, RelatedSearchQuerySet
 import dateutil.parser
 
-from rest_framework import generics, permissions, pagination
+from rest_framework import generics, permissions, pagination, authentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -42,6 +41,31 @@ from ddsc_site.models import (
 
 
 logger = logging.getLogger(__name__)
+
+
+class FixedSessionAuthentication(authentication.BaseAuthentication):
+    """
+    Use Django's session framework for authentication.
+    """
+
+    def authenticate(self, request):
+        """
+        Returns a `User` if the request session currently has a logged in user.
+        Otherwise returns `None`.
+        """
+
+        # Get the underlying HttpRequest object
+        http_request = request._request
+        user = getattr(http_request, 'user', None)
+
+        # Unauthenticated, CSRF validation not required
+        if not user or not user.is_active:
+            return None
+
+        # CSRF code removed due to POST'ing from another site
+
+        # CSRF passed with authenticated user
+        return (user, None)
 
 
 class FixedRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -391,10 +415,7 @@ class AnnotationsCreateView(generics.CreateAPIView):
     model = Annotation
     serializer_class = serializers.AnnotationCreateSerializer
     permission_classes = (permissions.IsAuthenticated,)
-
-    @method_decorator(csrf_exempt)
-    def post(self, *args, **kwargs):
-        return super(AnnotationsCreateView, self).post(*args, **kwargs)
+    authentication_classes = (FixedSessionAuthentication,)
 
     def pre_save(self, obj):
         obj.username = self.request.user.username
