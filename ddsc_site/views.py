@@ -194,18 +194,21 @@ class ProxyView(View):
 
 
 class CollageList(generics.ListCreateAPIView):
+    authentication_classes = (FixedSessionAuthentication,)
     model = Collage
     serializer_class = serializers.CollageListSerializer
     filter_backend = WorkspaceCollageFilterBackend
 
 
 class CollageDetail(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = (FixedSessionAuthentication,)
     model = Collage
     serializer_class = serializers.CollageListSerializer
     filter_backend = WorkspaceCollageFilterBackend
 
 
 class CollageItemList(generics.ListCreateAPIView):
+    authentication_classes = (FixedSessionAuthentication,)
     model = CollageItem
     serializer_class = serializers.CollageItemSerializer
     filter_field_prefix = 'collage__'
@@ -213,6 +216,7 @@ class CollageItemList(generics.ListCreateAPIView):
 
 
 class CollageItemDetail(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = (FixedSessionAuthentication,)
     model = CollageItem
     serializer_class = serializers.CollageItemSerializer
     filter_field_prefix = 'collage__'
