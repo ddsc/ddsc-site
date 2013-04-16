@@ -221,13 +221,13 @@ class UserProfileManager(models.Manager):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
-    initial_period = models.CharField(max_length=16, null=True, blank=True, default='1m')
+    initial_period = models.CharField(max_length=16, null=True, blank=True, default='')
     initial_zoom = models.CharField(max_length=255, null=True, blank=True, default='')
 
     objects = UserProfileManager()
 
     def clean(self):
-        valid_periods = ['24h', '48h', '1w', '1m', '1y']
+        valid_periods = ['', '24h', '48h', '1w', '1m', '1y']
         if self.initial_period not in valid_periods:
             raise ValidationError('Period "{}" is not a valid period; pick one of "{}"'.format(self.initial_period, valid_periods))
 

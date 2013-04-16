@@ -328,7 +328,7 @@ class CurrentAccount(APIView):
                     'user': {'username': 'n.v.t.',
                              'first_name': 'n.v.t.',
                              'last_name': 'n.v.t.'},
-                    'initialPeriod': '1m',
+                    'initialPeriod': '',
                     'initialZoom': ''
                     }
         return Response(data)
