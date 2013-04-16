@@ -312,7 +312,6 @@ class CurrentAccount(APIView):
         """
         Return account information.
         """
-        initial_period = '1m'
 
         if request.user.is_authenticated():
             user = request.user
@@ -321,14 +320,16 @@ class CurrentAccount(APIView):
                     'user': {'username': user.username,
                              'first_name': user.first_name,
                              'last_name': user.last_name},
-                    'initialPeriod': profile.initial_period
+                    'initialPeriod': profile.initial_period,
+                    'initialZoom': profile.initial_zoom
                     }
         else:
             data = {'authenticated': False,
                     'user': {'username': 'n.v.t.',
                              'first_name': 'n.v.t.',
                              'last_name': 'n.v.t.'},
-                    'initialPeriod': initial_period
+                    'initialPeriod': '1m',
+                    'initialZoom': ''
                     }
         return Response(data)
 

@@ -222,6 +222,7 @@ class UserProfileManager(models.Manager):
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
     initial_period = models.CharField(max_length=16, null=True, blank=True, default='1m')
+    initial_zoom = models.CharField(max_length=255, null=True, blank=True, default='')
 
     objects = UserProfileManager()
 
