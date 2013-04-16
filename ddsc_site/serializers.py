@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 from lizard_wms.models import WMSSource
 
-from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation, Visibility
+from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation, Visibility, VISIBILITY_CHOICES
 from ddsc_site.filters import filter_objects_for_creator
 
 
@@ -34,11 +34,48 @@ class JSONField(serializers.Field):
         return self.to_native(value)
 
 
+class VisibilityField(serializers.ChoiceField):
+    # to json
+    def to_native(self, obj):
+        vis2str = {
+            Visibility.PUBLIC: 'public',
+            Visibility.PRIVATE: 'private',
+        }
+        return vis2str.get(obj)
+
+    # from json
+    def from_native(self, obj):
+        result = None
+        if isinstance(obj, basestring):
+            str2vis = {
+                'public': Visibility.PUBLIC,
+                'private': Visibility.PRIVATE,
+            }
+            result = str2vis.get(obj)
+        return result if result is not None else super(VisibilityField, self).from_native(obj)
+
+
 class HyperlinkedIdModelSerializer(serializers.HyperlinkedModelSerializer):
     id = serializers.Field('id')
 
 
+class FilteredCollageField(serializers.HyperlinkedRelatedField):
+    def initialize(self, *args, **kwargs):
+        result = super(FilteredCollageField, self).initialize(*args, **kwargs)
+        if 'request' in self.context:
+            self.queryset = filter_objects_for_creator(
+                Collage, self.context['request'].user, self.queryset)
+        return result
+
+
 class CollageItemSerializer(HyperlinkedIdModelSerializer):
+    class Meta:
+        model = CollageItem
+
+
+class CollageItemCreateSerializer(HyperlinkedIdModelSerializer):
+    collage = FilteredCollageField(view_name='collage-detail')
+
     class Meta:
         model = CollageItem
 
@@ -50,6 +87,14 @@ class CollageListSerializer(HyperlinkedIdModelSerializer):
         model = Collage
         exclude = ('creator',)
 
+
+class CollageCreateSerializer(HyperlinkedIdModelSerializer):
+    creator = serializers.Field()
+    visibility = VisibilityField(required=True, choices=VISIBILITY_CHOICES)
+
+    class Meta:
+        model = Collage
+        exclude = ('creator',)
 
 class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='layer-detail')
@@ -158,27 +203,6 @@ class PointField(serializers.WritableField):
                 except Exception as ex:
                     raise ValidationError('location must be an array of floats: {0}'.format(ex))
                 return Point(x, y)
-
-
-class VisibilityField(serializers.ChoiceField):
-    # to json
-    def to_native(self, obj):
-        vis2str = {
-            Visibility.PUBLIC: 'public',
-            Visibility.PRIVATE: 'private',
-        }
-        return vis2str.get(obj)
-
-    # from json
-    def from_native(self, obj):
-        result = None
-        if isinstance(obj, basestring):
-            str2vis = {
-                'public': Visibility.PUBLIC,
-                'private': Visibility.PRIVATE,
-            }
-            result = str2vis.get(obj)
-        return result if result is not None else super(VisibilityField, self).from_native(obj)
 
 
 class AnnotationSerializer(serializers.ModelSerializer):

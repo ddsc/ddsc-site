@@ -1,6 +1,6 @@
 from rest_framework import permissions
 
-from ddsc_site.models import Workspace, WorkspaceItem
+from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem
 
 class IsCreatorOrReadOnly(permissions.BasePermission):
     """
@@ -27,6 +27,10 @@ class IsCreatorOrReadOnly(permissions.BasePermission):
                         return obj.creator == request.user
                     elif view.model is WorkspaceItem:
                         return obj.workspace.creator == request.user
+                    elif view.model is Collage:
+                        return obj.creator == request.user
+                    elif view.model is CollageItem:
+                        return obj.collage.creator == request.user
                     else:
                         return False
             else:

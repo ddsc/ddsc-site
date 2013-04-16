@@ -17,12 +17,14 @@ urlpatterns = patterns(
     url(r'^v1/collages/?$', views.CollageList.as_view(), name='collage-list'),
     url(r'^v1/collages/(?P<pk>\d+)/?$', views.CollageDetail.as_view(),
         name='collage-detail'),
+    url(r'^v1/collages/create/?$', views.CollageCreate.as_view(), name='collage-create'),
 
     url(r'^v1/collageitems/?$', views.CollageItemList.as_view(),
         name='collageitem-list'),
     url(r'^v1/collageitems/(?P<pk>\d+)/?$',
         views.CollageItemDetail.as_view(),
         name='collageitem-detail'),
+    url(r'^v1/collageitems/create/?$', views.CollageItemCreate.as_view(), name='collageitem-create'),
 
     url(r'^v1/workspaces/?$', views.WorkspaceList.as_view(), name='workspace-list'),
     url(r'^v1/workspaces/(?P<pk>\d+)/?$', views.WorkspaceDetail.as_view(),

@@ -45,7 +45,7 @@ from ddsc_site.models import (
 logger = logging.getLogger(__name__)
 
 
-class FixedSessionAuthentication(authentication.BaseAuthentication):
+class NoCsrfSessionAuthentication(authentication.BaseAuthentication):
     """
     Use Django's session framework for authentication.
     """
@@ -193,30 +193,48 @@ class ProxyView(View):
         return self._handle(request, requests.head, *args, **kwargs)
 
 
-class CollageList(generics.ListCreateAPIView):
-    authentication_classes = (FixedSessionAuthentication,)
+class CollageList(generics.ListAPIView):
     model = Collage
     serializer_class = serializers.CollageListSerializer
     filter_backend = WorkspaceCollageFilterBackend
 
 
-class CollageDetail(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = (FixedSessionAuthentication,)
+class CollageCreate(generics.CreateAPIView):
+    authentication_classes = (NoCsrfSessionAuthentication,)
+    model = Collage
+    serializer_class = serializers.CollageCreateSerializer
+    permission_classes = (permissions.IsAuthenticated, IsCreatorOrReadOnly)
+    filter_backend = WorkspaceCollageFilterBackend
+
+    def pre_save(self, obj):
+        obj.creator = self.request.user
+
+
+class CollageDetail(generics.RetrieveDestroyAPIView):
+    authentication_classes = (NoCsrfSessionAuthentication,)
     model = Collage
     serializer_class = serializers.CollageListSerializer
+    permission_classes = (permissions.IsAuthenticated, IsCreatorOrReadOnly)
     filter_backend = WorkspaceCollageFilterBackend
 
 
-class CollageItemList(generics.ListCreateAPIView):
-    authentication_classes = (FixedSessionAuthentication,)
+class CollageItemList(generics.ListAPIView):
     model = CollageItem
     serializer_class = serializers.CollageItemSerializer
     filter_field_prefix = 'collage__'
     filter_backend = WorkspaceCollageFilterBackend
 
 
-class CollageItemDetail(generics.RetrieveUpdateDestroyAPIView):
-    authentication_classes = (FixedSessionAuthentication,)
+class CollageItemCreate(generics.CreateAPIView):
+    authentication_classes = (NoCsrfSessionAuthentication,)
+    model = CollageItem
+    serializer_class = serializers.CollageItemCreateSerializer
+    permission_classes = (permissions.IsAuthenticated, IsCreatorOrReadOnly)
+    filter_field_prefix = 'collage__'
+    filter_backend = WorkspaceCollageFilterBackend
+
+
+class CollageItemDetail(generics.RetrieveAPIView):
     model = CollageItem
     serializer_class = serializers.CollageItemSerializer
     filter_field_prefix = 'collage__'
@@ -288,7 +306,7 @@ class LayerDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class CurrentAccount(APIView):
-    authentication_classes = (FixedSessionAuthentication,)
+    authentication_classes = (NoCsrfSessionAuthentication,)
 
     def get(self, request, format=None):
         """
@@ -446,7 +464,7 @@ class AnnotationsCreateView(generics.CreateAPIView):
     model = Annotation
     serializer_class = serializers.AnnotationCreateSerializer
     permission_classes = (permissions.IsAuthenticated,)
-    authentication_classes = (FixedSessionAuthentication,)
+    authentication_classes = (NoCsrfSessionAuthentication,)
 
     def pre_save(self, obj):
         obj.username = self.request.user.username
