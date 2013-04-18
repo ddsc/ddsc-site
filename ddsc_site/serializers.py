@@ -235,6 +235,8 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
 
 
 class AnnotationDetailSerializer(serializers.ModelSerializer):
+    visibility = VisibilityField(required=True, choices=((Visibility.PRIVATE, 'private'), (Visibility.PUBLIC, 'public')))
+    
     class Meta:
         model = Annotation
         exclude = ('username',)
