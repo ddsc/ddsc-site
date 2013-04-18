@@ -81,6 +81,7 @@ class CollageItemCreateSerializer(HyperlinkedIdModelSerializer):
 
 
 class CollageListSerializer(HyperlinkedIdModelSerializer):
+    visibility = VisibilityField()
     collageitems = CollageItemSerializer(source='collageitem_set')
 
     class Meta:
