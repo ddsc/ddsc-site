@@ -470,3 +470,10 @@ class AnnotationsCreateView(generics.CreateAPIView):
 
     def pre_save(self, obj):
         obj.username = self.request.user.username
+
+
+class AnnotationsDetailView(generics.RetrieveUpdateDestroyAPIView):
+    model = Annotation
+    serializer_class = serializers.AnnotationDetailSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+    authentication_classes = (NoCsrfSessionAuthentication,)

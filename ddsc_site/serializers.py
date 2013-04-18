@@ -232,3 +232,8 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Annotation
+
+
+class AnnotationDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Annotation
