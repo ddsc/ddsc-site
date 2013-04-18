@@ -237,3 +237,4 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
 class AnnotationDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Annotation
+        exclude = ('username',)
