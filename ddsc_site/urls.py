@@ -50,7 +50,7 @@ urlpatterns = patterns(
 
     url(r'^v1/annotations/search/$', views.AnnotationsSearchView.as_view(), name='annotations-search'),
     url(r'^v1/annotations/detail/(?P<pk>\d+)/?$', 
-        views.AnnotationsDetailView.as_view(), name='annotations-detail'),
+        views.AnnotationsDetailView.as_view(), name='annotation-detail'),
     url(r'^v1/annotations/count/$',  views.AnnotationsCountView.as_view(),  name='annotations-count'),
     url(r'^v1/annotations/create/$', views.AnnotationsCreateView.as_view(), name='annotations-create'),
     url(r'^', include('lizard_auth_client.urls')),

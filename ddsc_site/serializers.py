@@ -198,7 +198,7 @@ class PointField(serializers.WritableField):
                 except Exception as ex:
                     raise ValidationError('location must be a comma separated pair of coordinates: {0}'.format(ex))
                 return Point(x, y)
-            elif isinstance(lst, (list, tuple)):
+            elif isinstance(obj, (list, tuple)):
                 try:
                     x, y = float(obj[0]), float(obj[1])
                 except Exception as ex:
@@ -206,12 +206,13 @@ class PointField(serializers.WritableField):
                 return Point(x, y)
 
 
-class AnnotationSerializer(serializers.ModelSerializer):
+class AnnotationSerializer(HyperlinkedIdModelSerializer):
     location = PointField(source='location')
     related_model_str = serializers.CharField(source='get_related_model_str')
+    visibility = VisibilityField(required=True, choices=((Visibility.PRIVATE, 'private'), (Visibility.PUBLIC, 'public')))
 
     def to_native(self, obj):
-        # use the Postgres database object, instead of the search index result
+        # use the Postgres database object (obj.object), instead of the search index result
         return super(AnnotationSerializer, self).to_native(obj.object)
 
     class Meta:
@@ -237,6 +238,7 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
 
 class AnnotationDetailSerializer(serializers.ModelSerializer):
     visibility = VisibilityField(required=True, choices=((Visibility.PRIVATE, 'private'), (Visibility.PUBLIC, 'public')))
+    location = PointField(required=False)
     
     class Meta:
         model = Annotation
