@@ -3,7 +3,8 @@ from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 
 import logging
-from urlparse import urlparse
+import urlparse
+import urllib
 
 from django.conf import settings
 from django.utils.decorators import method_decorator
@@ -135,13 +136,19 @@ class ProxyView(View):
 
     def parse_url(self):
         url = self.request.GET.get('url', None)
-        url_parsed = urlparse(url)
+        url_parsed = urlparse.urlparse(url)
         if not url_parsed.scheme in self.allowed_schemes:
             raise ProxyUrlNotAllowed('Scheme {0} not allowed.'.format(url_parsed.scheme))
         hostname = url_parsed.hostname.lower()
         if not ProxyHostname.objects.filter(hostname=hostname).exists():
             raise ProxyUrlNotAllowed('Hostname {0} not in ProxyHostname table.'.format(hostname))
-        return url
+        # Add authentication details
+        parts = list(url_parsed)
+        if self.request.user.is_authenticated():
+            qs_dict = urlparse.parse_qs(parts[4], keep_blank_values=True)
+            qs_dict['viewparams'] = 'usr:{0}'.format(self.request.user.username)
+            parts[4] = urllib.urlencode(qs_dict, doseq=True)
+        return urlparse.urlunparse(parts)
 
     def copy_request_headers(self):
         headers = {}
