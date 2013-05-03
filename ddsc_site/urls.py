@@ -46,7 +46,8 @@ urlpatterns = patterns(
     url(r'^v1/account/logout-url/?$', LogoutApiView.as_view(),
         name='ddsc_site.sso-logout'),
 
-    url(r'^v1/proxy/?$', views.ProxyView.as_view(), name='proxy'),
+    url(r'^v1/proxy/$', views.ProxyView.as_view(), name='proxy'),
+    url(r'^v1/proxy/(?P<urlbase>.+)', views.ProxyView.as_view(), name='proxy'),
 
     url(r'^v1/annotations/search/$', views.AnnotationsSearchView.as_view(), name='annotations-search'),
     url(r'^v1/annotations/detail/(?P<pk>\d+)/?$', 

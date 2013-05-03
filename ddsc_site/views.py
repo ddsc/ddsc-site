@@ -134,8 +134,7 @@ class ProxyView(View):
     }
     allowed_schemes = ['http', 'https']
 
-    def parse_url(self):
-        url = self.request.GET.get('url', None)
+    def parse_url(self, url):
         url_parsed = urlparse.urlparse(url)
         if not url_parsed.scheme in self.allowed_schemes:
             raise ProxyUrlNotAllowed('Scheme {0} not allowed.'.format(url_parsed.scheme))
@@ -173,10 +172,17 @@ class ProxyView(View):
         response.content = proxied_response.content
         return response
 
-    def _handle(self, request, requestsmethod, *args, **kwargs):
+    def _handle(self, request, requestsmethod, urlbase=None, **kwargs):
         # Parse requested URL and disallow unknown sites.
         try:
-            url = self.parse_url()
+            if urlbase is None:
+                url = self.request.GET.get('url', None)
+            else:
+                if request.META['QUERY_STRING']:
+                    url = urlbase + '?' + request.META['QUERY_STRING']
+                else:
+                    url = urlbase
+            url = self.parse_url(url)
         except ProxyUrlNotAllowed as e:
             return HttpResponseForbidden(e.message)
         # Copy a subset of headers from the current request.
