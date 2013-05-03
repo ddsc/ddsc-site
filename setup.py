@@ -15,7 +15,7 @@ install_requires = [
     'django-nose',
     'django-filter',
     'django-cors-headers',
-    'django-haystack >= 2.0.0-beta',
+    'django-haystack', # should be at least 2.0.0-beta, but PyPI is broken, so use development checkout from github
     'geopy', # optional dependency of django-haystack
     'pysolr', # optional dependency of django-haystack
     'cssselect', # optional dependency of django-haystack
