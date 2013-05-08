@@ -4,6 +4,7 @@ from __future__ import absolute_import, division
 
 import datetime
 import random
+import os
 
 from django.db import models
 from django.db.models.loading import get_model
@@ -13,6 +14,7 @@ from django.contrib.auth.models import Group, User
 from django.contrib.gis.geos import GEOSGeometry, Point
 from django.contrib.gis.db.models import PointField
 from django.db.models.signals import post_save
+from django.core.urlresolvers import reverse
 
 from lizard_wms.models import WMSSource
 
@@ -210,6 +212,34 @@ class Annotation(models.Model):
 
     def __unicode__(self):
         return "Annotation {0}".format(self.pk)
+
+
+class AnnotationAttachment(models.Model):
+    annotation = models.ForeignKey(Annotation, null=True, blank=True)
+    name = models.CharField(null=True, blank=True, max_length=255)
+    creator = models.ForeignKey(User)
+
+    def __unicode__(self):
+        return "AnnotationAttachment {0}, annotation {1}".format(self.pk, self.annotation)
+
+    def filename(self):
+        if self.pk is None:
+            raise Exception('No primary key, save() first!')
+        # Imitate the same extension
+        fn = [str(self.pk)]
+        # Note: ext includes the "."
+        ext = os.path.splitext(self.name)[1]
+        if ext:
+            fn.append(ext)
+        return ''.join(fn)
+
+    def path(self):
+        path = os.path.join(settings.ANNOTATION_ATTACHMENTS_DIR, self.filename())
+        return os.path.abspath(path)
+
+    def absurl(self, request):
+        url = request.build_absolute_uri(reverse('annotations-files-get', kwargs={'pk': self.pk, 'filename': self.name}))
+        return url
 
 
 class UserProfileManager(models.Manager):

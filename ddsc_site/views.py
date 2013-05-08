@@ -5,6 +5,8 @@ from __future__ import absolute_import, division
 import logging
 import urlparse
 import urllib
+import os
+import mimetypes
 
 from django.conf import settings
 from django.utils.decorators import method_decorator
@@ -12,9 +14,13 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
 from django.views.decorators.gzip import gzip_page
 from django.views.generic import View
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, Http404
 from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
+from django import forms
+from django.utils import simplejson
+from django.shortcuts import get_object_or_404
+from django.core.servers.basehttp import FileWrapper
 
 import requests
 from haystack.utils.geo import generate_bounding_box, Point
@@ -38,6 +44,7 @@ from ddsc_site.models import (
     WorkspaceItem,
     ProxyHostname,
     Annotation,
+    AnnotationAttachment,
     Visibility,
     UserProfile
 )
@@ -216,7 +223,7 @@ class CollageCreate(generics.CreateAPIView):
     authentication_classes = (NoCsrfSessionAuthentication,)
     model = Collage
     serializer_class = serializers.CollageCreateSerializer
-    permission_classes = (permissions.IsAuthenticated, IsCreatorOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCreatorOrReadOnly)
     filter_backend = WorkspaceCollageFilterBackend
 
     def pre_save(self, obj):
@@ -227,7 +234,7 @@ class CollageDetail(generics.RetrieveDestroyAPIView):
     authentication_classes = (NoCsrfSessionAuthentication,)
     model = Collage
     serializer_class = serializers.CollageListSerializer
-    permission_classes = (permissions.IsAuthenticated, IsCreatorOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCreatorOrReadOnly)
     filter_backend = WorkspaceCollageFilterBackend
 
 
@@ -248,6 +255,7 @@ class CollageItemCreate(generics.CreateAPIView):
 
 
 class CollageItemDetail(generics.RetrieveAPIView):
+    authentication_classes = (NoCsrfSessionAuthentication,)
     model = CollageItem
     serializer_class = serializers.CollageItemSerializer
     filter_field_prefix = 'collage__'
@@ -484,9 +492,104 @@ class AnnotationsCreateView(generics.CreateAPIView):
     def pre_save(self, obj):
         obj.username = self.request.user.username
 
+    def post_save(self, obj, created):
+        attachment_pk = self.request.POST.get('attachment_pk')
+        if attachment_pk:
+            try:
+                attachment = AnnotationAttachment.objects.get(pk=attachment_pk)
+                attachment.annotation = obj
+                attachment.save()
+            except AnnotationAttachment.DoesNotExist:
+                pass
+
 
 class AnnotationsDetailView(generics.RetrieveUpdateDestroyAPIView):
     model = Annotation
     serializer_class = serializers.AnnotationDetailSerializer
-    permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated, IsCreatorOrReadOnly)
     authentication_classes = (NoCsrfSessionAuthentication,)
+
+    def post_save(self, obj, created):
+        attachment_pk = self.request.POST.get('attachment_pk')
+        if attachment_pk:
+            try:
+                attachment = AnnotationAttachment.objects.get(pk=attachment_pk)
+                attachment.annotation = obj
+                attachment.save()
+            except AnnotationAttachment.DoesNotExist:
+                pass
+
+
+class AnnotationsFileForm(forms.Form):
+    attachment = forms.FileField(required=True)
+
+    def clean_attachment(self):
+        attachment = self.cleaned_data.get('attachment')
+        if attachment:
+            if attachment._size > 10*1024*1024:
+                raise ValidationError("File too large ( > 10mb )")
+            return attachment
+
+
+class AnnotationsFileView(APIView):
+    authentication_classes = (NoCsrfSessionAuthentication,)
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request, pk=None, filename=None, **kwargs):
+        '''
+        Note: this won't work with GzipMiddleware, which some whatever reason
+        can't be disable per view.
+        '''
+
+        attachment = get_object_or_404(AnnotationAttachment, pk=pk)
+        if attachment.annotation:
+            if attachment.annotation.visibility == Visibility.PRIVATE:
+                if request.user.username != attachment.annotation.username:
+                    raise Http404('Attachment not found.')
+
+        path = attachment.path()
+        file_url = urllib.pathname2url(path)
+        content_type = mimetypes.guess_type(file_url)[0]
+
+        response = HttpResponse(
+            content=FileWrapper(open(path, 'rb')),
+            content_type=content_type
+        )
+        #response['Content-Disposition'] = 'attachment; filename="{0}"'.format(attachment.name)
+        response['Content-Length'] = os.path.getsize(path)
+        return response
+
+    def post(self, request, *args, **kwargs):
+        form = AnnotationsFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            attachment = form.cleaned_data['attachment']
+
+            # create the model containing metadata
+            attachment_model = AnnotationAttachment(
+                name=attachment.name,
+                creator=request.user
+            )
+            attachment_model.save()
+
+            # write the uploaded file to disk
+            with open(attachment_model.path(), 'wb+') as destination:
+                for chunk in attachment.chunks():
+                    destination.write(chunk)
+
+            # determine the response
+            data = {
+                'success': True,
+                'filename': attachment_model.name,
+                'url': attachment_model.absurl(request),
+                'attachment_pk': attachment_model.pk,
+                #'thumbnail_url': settings.MEDIA_URL + "pictures/" + f.name.replace(" ", "_"),
+                #'delete_url': reverse('upload-delete', args=[self.object.id]), 'delete_type': "DELETE"
+            }
+            status = 200
+        else:
+            data = {'success': False, 'errors': form.errors}
+            status = 200 # Keep this 200
+
+        # Yes, we need to use text/plain for this to support IE9.
+        # return Response(data, status=status)
+        return HttpResponse(content=simplejson.dumps(data), status=status, content_type='text/plain')
