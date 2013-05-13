@@ -242,4 +242,4 @@ class AnnotationDetailSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Annotation
-        exclude = ('username',)
+        read_only = ('username',)

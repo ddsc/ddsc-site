@@ -21,6 +21,7 @@ from django import forms
 from django.utils import simplejson
 from django.shortcuts import get_object_or_404
 from django.core.servers.basehttp import FileWrapper
+from django.contrib.gis.geos import DjangoGisPoint
 
 import requests
 from haystack.utils.geo import generate_bounding_box, Point
@@ -501,6 +502,18 @@ class AnnotationsCreateView(generics.CreateAPIView):
                 attachment.save()
             except AnnotationAttachment.DoesNotExist:
                 pass
+        # Copy location coordinates of anything related to a Location
+        if obj.the_model_name:
+            related_model = obj.get_related_model()
+            if related_model:
+                if related_model._meta.get_field('point_geometry') and related_model.point_geometry:
+                    coords = related_model.point_geometry.coords
+                    obj.location = DjangoGisPoint(
+                        coords[0],
+                        coords[1],
+                        srid=4326
+                    )
+                    obj.save()
 
 
 class AnnotationsDetailView(generics.RetrieveUpdateDestroyAPIView):
