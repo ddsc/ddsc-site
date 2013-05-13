@@ -21,7 +21,7 @@ from django import forms
 from django.utils import simplejson
 from django.shortcuts import get_object_or_404
 from django.core.servers.basehttp import FileWrapper
-from django.contrib.gis.geos import DjangoGisPoint
+from django.contrib.gis.geos import Point as DjangoGisPoint
 
 import requests
 from haystack.utils.geo import generate_bounding_box, Point
