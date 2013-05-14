@@ -172,9 +172,10 @@ class ProxyView(View):
         response.status_code = proxied_response.status_code
         # Copy response headers to the response we send to the client.
         for header, value in proxied_response.headers.items():
-            if header.lower() == 'content-encoding':
+            if header.lower() in ['content-encoding', 'content-length']:
                 # Gzipped content is already decompressed by the Python
                 # requests library. Don't pass this header.
+                # Also have Django calculate Content-Length.
                 continue
             logger.debug('proxy: got header from actual server: %s: %s', header, value)
             response[header] = value
