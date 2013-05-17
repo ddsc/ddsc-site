@@ -57,14 +57,19 @@ def filter_objects_for_user(model, user, queryset, filter_field_prefix=''):
         is_creator = {
             filter_field_prefix + 'creator': user
         }
-        common_usergroup = {
+        common_usergroup1 = {
             filter_field_prefix + 'visibility': Visibility.USERGROUPS,
-            filter_field_prefix + 'creator__managed_user_groups__in': current_user_usergroups,
+            filter_field_prefix + 'creator__managed_user_groups__in': current_user_usergroups
+        }
+        common_usergroup2 = {
+            filter_field_prefix + 'visibility': Visibility.USERGROUPS,
             filter_field_prefix + 'creator__user_group_memberships__in': current_user_usergroups
         }
         result = queryset.filter(
             Q(**is_public) |
             Q(**is_creator) |
-            Q(**common_usergroup)
+            Q(**common_usergroup1) |
+            Q(**common_usergroup2)
         )
+        result = result.distinct()
         return result
