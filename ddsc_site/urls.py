@@ -56,6 +56,7 @@ urlpatterns = patterns(
     url(r'^v1/annotations/create/$', views.AnnotationsCreateView.as_view(), name='annotations-create'),
     url(r'^v1/annotations/files/$', views.AnnotationsFileView.as_view(), name='annotations-files-post'),
     url(r'^v1/annotations/files/(?P<pk>\d+)/(?P<filename>.*)$', views.AnnotationsFileView.as_view(), name='annotations-files-get'),
+    url(r'^v1/version/$', views.VersionView.as_view(), name='version'),
     url(r'^', include('lizard_auth_client.urls')),
 )
 urlpatterns += debugmode_urlpatterns()

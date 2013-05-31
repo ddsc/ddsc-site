@@ -27,6 +27,7 @@ from django.db.models.fields import FieldDoesNotExist
 import requests
 from haystack.utils.geo import generate_bounding_box, Point
 from haystack.query import SQ, SearchQuerySet, RelatedSearchQuerySet
+from pkginfo.installed import Installed
 import dateutil.parser
 
 from rest_framework import generics, permissions, pagination, authentication
@@ -35,6 +36,7 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from lizard_wms.models import WMSSource
 
+import ddsc_api
 from ddsc_site import serializers
 from ddsc_site.filters import WorkspaceCollageFilterBackend
 from ddsc_site.permissions import IsCreatorOrReadOnly
@@ -611,3 +613,10 @@ class AnnotationsFileView(APIView):
         # Yes, we need to use text/plain for this to support IE9.
         # return Response(data, status=status)
         return HttpResponse(content=simplejson.dumps(data), status=status, content_type='text/plain')
+
+
+class VersionView(APIView):
+    def get(self, request, format=None):
+        response = {'version' : Installed(ddsc_api).version}
+
+        return Response(response)
