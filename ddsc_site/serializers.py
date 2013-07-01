@@ -133,6 +133,21 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
             except ValueError:
                 return {}
 
+    def get_legend_url(self, obj):
+        if obj.legend_url:
+            # use the overridden custom legend URL
+            return obj.legend_url
+        else:
+            # automagically build GeoServer compatible legend URL
+            return (
+                '{0}'
+                '?REQUEST=GetLegendGraphic'
+                '&VERSION=1.0.0'
+                '&FORMAT=image/png'
+                '&WIDTH=20&HEIGHT=20'
+                '&LAYER={1}'
+            ).format(obj.url, obj.layer_name)
+
     def get_type(self, obj):
         return 'wms'
 
