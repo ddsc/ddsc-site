@@ -111,6 +111,7 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
     type = serializers.SerializerMethodField('get_type')
 
     options = serializers.SerializerMethodField('get_options')
+    legend_url = serializers.SerializerMethodField('get_legend_url')
 
     wms_url = serializers.Field('url')
 
