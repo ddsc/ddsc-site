@@ -142,6 +142,12 @@ class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
                 return {}
 
     def get_legend_url(self, obj):
+
+        # Our raster server does not yet support legends.
+        # Return None if show_legend is disabled.
+        if not obj.show_legend:
+            return None
+
         if obj.legend_url:
             # use the overridden custom legend URL
             return obj.legend_url
