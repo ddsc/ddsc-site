@@ -8,7 +8,10 @@ from django.core.exceptions import ValidationError
 
 from lizard_wms.models import WMSSource
 
-from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation, Visibility, VISIBILITY_CHOICES
+from ddsc_site.models import (
+    Annotation, Collage, CollageItem, VISIBILITY_CHOICES, Visibility,
+    Workspace, WorkspaceItem
+    )
 from ddsc_site.filters import filter_objects_for_creator
 
 
@@ -52,7 +55,10 @@ class VisibilityField(serializers.ChoiceField):
                 'private': Visibility.PRIVATE,
             }
             result = str2vis.get(obj)
-        return result if result is not None else super(VisibilityField, self).from_native(obj)
+        return (
+            result if result is not None
+            else super(VisibilityField, self).from_native(obj)
+            )
 
 
 class HyperlinkedIdModelSerializer(serializers.HyperlinkedModelSerializer):
@@ -96,6 +102,7 @@ class CollageCreateSerializer(HyperlinkedIdModelSerializer):
     class Meta:
         model = Collage
         exclude = ('creator',)
+
 
 class WMSLayerSerializer(serializers.HyperlinkedModelSerializer):
     url = serializers.HyperlinkedIdentityField(view_name='layer-detail')
@@ -212,23 +219,35 @@ class PointField(serializers.WritableField):
                     obj = obj.split(',')
                     x, y = float(obj[0]), float(obj[1])
                 except Exception as ex:
-                    raise ValidationError('location must be a comma separated pair of coordinates: {0}'.format(ex))
+                    raise ValidationError(
+                        'location must be a comma separated pair of '
+                        'coordinates: {0}'.format(ex)
+                    )
                 return Point(x, y)
             elif isinstance(obj, (list, tuple)):
                 try:
                     x, y = float(obj[0]), float(obj[1])
                 except Exception as ex:
-                    raise ValidationError('location must be an array of floats: {0}'.format(ex))
+                    raise ValidationError(
+                        'location must be an array of floats: {0}'.format(ex)
+                    )
                 return Point(x, y)
 
 
 class AnnotationSerializer(HyperlinkedIdModelSerializer):
     location = PointField(source='location')
     related_model_str = serializers.CharField(source='get_related_model_str')
-    visibility = VisibilityField(required=True, choices=((Visibility.PRIVATE, 'private'), (Visibility.PUBLIC, 'public')))
+    visibility = VisibilityField(
+        required=True,
+        choices=(
+            (Visibility.PRIVATE, 'private'),
+            (Visibility.PUBLIC, 'public'),
+        )
+    )
 
     def to_native(self, obj):
-        # use the Postgres database object (obj.object), instead of the search index result
+        # use the Postgres database object (obj.object),
+        # instead of the search index result
         return super(AnnotationSerializer, self).to_native(obj.object)
 
     class Meta:
@@ -245,7 +264,13 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
     datetime_from = serializers.DateTimeField(required=False)
     datetime_until = serializers.DateTimeField(required=False)
     tags = serializers.CharField(required=False, widget=widgets.Textarea)
-    visibility = VisibilityField(required=True, choices=((Visibility.PRIVATE, 'private'), (Visibility.PUBLIC, 'public')))
+    visibility = VisibilityField(
+        required=True,
+        choices=(
+            (Visibility.PRIVATE, 'private'),
+            (Visibility.PUBLIC, 'public'),
+        )
+    )
     username = serializers.Field()
 
     class Meta:
@@ -253,9 +278,15 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
 
 
 class AnnotationDetailSerializer(serializers.ModelSerializer):
-    visibility = VisibilityField(required=True, choices=((Visibility.PRIVATE, 'private'), (Visibility.PUBLIC, 'public')))
+    visibility = VisibilityField(
+        required=True,
+        choices=(
+            (Visibility.PRIVATE, 'private'),
+            (Visibility.PUBLIC, 'public'),
+        )
+    )
     location = PointField(required=False)
-    
+
     class Meta:
         model = Annotation
         read_only = ('username',)
