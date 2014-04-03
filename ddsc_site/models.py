@@ -253,6 +253,7 @@ class UserProfile(models.Model):
     user = models.OneToOneField(User)
     initial_period = models.CharField(max_length=16, null=True, blank=True, default='')
     initial_zoom = models.CharField(max_length=255, null=True, blank=True, default='')
+    panner = models.BooleanField(default=False)
 
     objects = UserProfileManager()
 
