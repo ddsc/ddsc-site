@@ -33,6 +33,7 @@ class AnnotationIndex(indexes.SearchIndex, indexes.Indexable):
     def get_updated_field(self):
         return 'updated_at'
 
+
 class TimeseriesIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, model_attr='name')
     location_name = indexes.CharField(model_attr='location__name', null=True)
