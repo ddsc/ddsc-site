@@ -3,22 +3,23 @@ from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 
 import datetime
-import random
 import os
+import random
 
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.db import connection
 from django.db import models
 from django.db.models.loading import get_model
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import Group, User
-from django.contrib.gis.geos import GEOSGeometry, Point
-from django.contrib.gis.db.models import PointField
 from django.db.models.signals import post_save
-from django.core.urlresolvers import reverse
-
-from lizard_wms.models import WMSSource
 
 from jsonfield.fields import JSONField
+
+from lizard_wms.models import WMSSource
 
 
 class Visibility:
@@ -31,6 +32,7 @@ VISIBILITY_CHOICES = (
     (Visibility.USERGROUPS, 'usergroups'),
     (Visibility.PUBLIC, 'public'),
 )
+
 
 class Collage(models.Model):
     """Collages."""
@@ -190,7 +192,7 @@ class Annotation(models.Model):
         if model:
             try:
                 model_instance = model.objects.get(pk=self.the_model_pk)
-            except model.DoesNotExist as ex:
+            except model.DoesNotExist:
                 model_instance = None
             return model_instance
 
@@ -275,10 +277,20 @@ class UserProfile(models.Model):
         profile, c = UserProfile.objects.get_or_create(user=user)
         return profile
 
+
+def db_table_exists(table_name):
+    return table_name in connection.introspection.table_names()
+
+
 # have the creation of a User trigger the creation of a Profile
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance)
-
+        # Initially, when applying syncdb, there is no ddsc_site_userprofile
+        # table yet, making the createsuperuser command fail. This problem
+        # is addressed by checking the existence of the table first. (An
+        # alternative would be to defer the creation of an admin account
+        # until all database migrations have been applied.)
+        if db_table_exists("ddsc_site_userprofile"):
+            UserProfile.objects.create(user=instance)
 
 post_save.connect(create_user_profile, sender=User)
