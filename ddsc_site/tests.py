@@ -26,7 +26,7 @@ class LayersTest(TestCase):
         instance(request)
 
     def test_serializer(self):
-        from ddsc_site.views import WMSLayerSerializer as Serializer
+        from ddsc_site.serializers import WMSLayerSerializer as Serializer
 
         data = Serializer(self.wms_source).data
 

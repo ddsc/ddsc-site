@@ -37,6 +37,15 @@ CORS_ORIGIN_WHITELIST = (
 
 WEBCLIENT = 'http://localhost:8000'
 
+# Necessary to import haystack
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.solr_backend.SolrEngine',
+        'URL': 'http://127.0.0.1:8080/solr'
+    },
+}
+
+
 try:
     from ddsc_site.localsettings import *
     # For local dev overrides.
