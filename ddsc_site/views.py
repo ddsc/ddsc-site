@@ -36,7 +36,6 @@ from rest_framework.response import Response
 from rest_framework.settings import api_settings
 from lizard_wms.models import WMSSource
 
-import ddsc_api
 from ddsc_site import serializers
 from ddsc_site.filters import WorkspaceCollageFilterBackend
 from ddsc_site.permissions import IsCreatorOrReadOnly
@@ -619,6 +618,9 @@ class AnnotationsFileView(APIView):
 
 class VersionView(APIView):
     def get(self, request, format=None):
+        # Only import ddsc_api here so that ddsc_site can be tested on its
+        # own, as long as this view isn't called.
+        import ddsc_api
         response = {'version' : Installed(ddsc_api).version}
 
         return Response(response)
