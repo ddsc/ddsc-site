@@ -9,28 +9,23 @@ import os
 import mimetypes
 
 from django.conf import settings
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured
-from django.views.decorators.gzip import gzip_page
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden, Http404
-from django.core.paginator import Paginator
 from django.core.exceptions import ValidationError
 from django import forms
 from django.utils import simplejson
 from django.shortcuts import get_object_or_404
 from django.core.servers.basehttp import FileWrapper
-from django.contrib.gis.geos import Point as DjangoGisPoint
+from django.contrib.gis.geos import Point
 from django.db.models.fields import FieldDoesNotExist
 
 import requests
-from haystack.utils.geo import generate_bounding_box, Point
-from haystack.query import SQ, SearchQuerySet, RelatedSearchQuerySet
 from pkginfo.installed import Installed
+from haystack.query import SQ, SearchQuerySet
 import dateutil.parser
 
-from rest_framework import generics, permissions, pagination, authentication
+from rest_framework import generics, permissions, authentication
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.settings import api_settings
@@ -83,7 +78,8 @@ class NoCsrfSessionAuthentication(authentication.BaseAuthentication):
 
 class FixedRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     '''
-    Workaround for https://github.com/tomchristie/django-rest-framework/issues/682 .
+    Workaround for
+    https://github.com/tomchristie/django-rest-framework/issues/682 .
     '''
     filter_backend = api_settings.FILTER_BACKEND
 
@@ -100,7 +96,8 @@ class FixedRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
         if queryset is None:
             queryset = self.get_queryset()
         queryset = self.filter_queryset(queryset)
-        obj = super(FixedRetrieveUpdateDestroyAPIView, self).get_object(queryset)
+        obj = super(
+            FixedRetrieveUpdateDestroyAPIView, self).get_object(queryset)
         if not self.has_permission(self.request, obj):
             self.permission_denied(self.request)
         return obj
@@ -117,8 +114,9 @@ class FixedRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
         elif self.model is not None:
             queryset = self.model._default_manager.all()
         else:
-            raise ImproperlyConfigured(u"'%s' must define 'queryset' or 'model'"
-                                       % self.__class__.__name__)
+            raise ImproperlyConfigured(
+                u"'%s' must define 'queryset' or 'model'"
+                % self.__class__.__name__)
         return queryset
 
 
@@ -147,15 +145,18 @@ class ProxyView(View):
     def parse_url(self, url):
         url_parsed = urlparse.urlparse(url)
         if not url_parsed.scheme in self.allowed_schemes:
-            raise ProxyUrlNotAllowed('Scheme {0} not allowed.'.format(url_parsed.scheme))
+            raise ProxyUrlNotAllowed(
+                'Scheme {0} not allowed.'.format(url_parsed.scheme))
         hostname = url_parsed.hostname.lower()
         if not ProxyHostname.objects.filter(hostname=hostname).exists():
-            raise ProxyUrlNotAllowed('Hostname {0} not in ProxyHostname table.'.format(hostname))
+            raise ProxyUrlNotAllowed(
+                'Hostname {0} not in ProxyHostname table.'.format(hostname))
         # Add authentication details
         parts = list(url_parsed)
         if self.request.user.is_authenticated():
             qs_dict = urlparse.parse_qs(parts[4], keep_blank_values=True)
-            qs_dict['viewparams'] = 'usr:{0}'.format(self.request.user.username)
+            qs_dict['viewparams'] = 'usr:{0}'.format(
+                self.request.user.username)
             parts[4] = urllib.urlencode(qs_dict, doseq=True)
         return urlparse.urlunparse(parts)
 
@@ -164,7 +165,9 @@ class ProxyView(View):
         for django_header, http_header in self.copy_headers.items():
             value = self.request.META.get(django_header, None)
             if value is not None:
-                logger.debug('proxy: proxying header to actual server: %s: %s', http_header, value)
+                logger.debug(
+                    'proxy: proxying header to actual server: %s: %s',
+                    http_header, value)
                 headers[http_header] = value
         return headers
 
@@ -178,7 +181,8 @@ class ProxyView(View):
                 # requests library. Don't pass this header.
                 # Also have Django calculate Content-Length.
                 continue
-            logger.debug('proxy: got header from actual server: %s: %s', header, value)
+            logger.debug(
+                'proxy: got header from actual server: %s: %s', header, value)
             response[header] = value
         response.content = proxied_response.content
         return response
@@ -206,7 +210,8 @@ class ProxyView(View):
         )
         # Translate requests response to a Django compatible one.
         response = self.translate_to_wsgi_response(proxied_response)
-        logger.debug('proxy: proxied %s bytes from %s', len(response.content), url)
+        logger.debug(
+            'proxy: proxied %s bytes from %s', len(response.content), url)
         # Send the data.
         return response
 
@@ -227,7 +232,8 @@ class CollageCreate(generics.CreateAPIView):
     authentication_classes = (NoCsrfSessionAuthentication,)
     model = Collage
     serializer_class = serializers.CollageCreateSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCreatorOrReadOnly)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly, IsCreatorOrReadOnly)
     filter_backend = WorkspaceCollageFilterBackend
 
     def pre_save(self, obj):
@@ -238,7 +244,8 @@ class CollageDetail(generics.RetrieveDestroyAPIView):
     authentication_classes = (NoCsrfSessionAuthentication,)
     model = Collage
     serializer_class = serializers.CollageListSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsCreatorOrReadOnly)
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly, IsCreatorOrReadOnly)
     filter_backend = WorkspaceCollageFilterBackend
 
 
@@ -277,19 +284,8 @@ class WorkspaceList(generics.ListCreateAPIView):
     def pre_save(self, obj):
         obj.creator = self.request.user
 
-#    def get(self, request, *args, **kwargs):
 
-#    serializer_class_list = serializers.WorkspaceListSerializer
-#    serializer_class_create = serializers.WorkspaceCreateSerializer
-#
-#    def get_serializer_class(self):
-#        if self.request.method in ('POST', 'PUT'):
-#            return self.serializer_class_create
-#        else:
-#            return self.serializer_class_list
-
-
-class WorkspaceDetail(generics.RetrieveUpdateDestroyAPIView): #FixedRetrieveUpdateDestroyAPIView):
+class WorkspaceDetail(generics.RetrieveUpdateDestroyAPIView):
     model = Workspace
     serializer_class = serializers.WorkspaceListSerializer
     filter_backend = WorkspaceCollageFilterBackend
@@ -299,6 +295,7 @@ class WorkspaceDetail(generics.RetrieveUpdateDestroyAPIView): #FixedRetrieveUpda
 
     def pre_save(self, obj):
         obj.creator = self.request.user
+
 
 class WorkspaceItemList(generics.ListCreateAPIView):
     model = WorkspaceItem
@@ -310,7 +307,7 @@ class WorkspaceItemList(generics.ListCreateAPIView):
     )
 
 
-class WorkspaceItemDetail(generics.RetrieveUpdateDestroyAPIView): #FixedRetrieveUpdateDestroyAPIView):
+class WorkspaceItemDetail(generics.RetrieveUpdateDestroyAPIView):
     model = WorkspaceItem
     serializer_class = serializers.WorkspaceItemSerializer
     filter_field_prefix = 'workspace__'
@@ -359,7 +356,6 @@ class CurrentAccount(APIView):
                     'panner': False
                     }
         return Response(data)
-
 
     def post(self, request, format=None):
         if request.user.is_authenticated():
@@ -435,7 +431,9 @@ def filter_annotations(request, sqs):
     the_model_name = request.GET.get('model_name')
     the_model_pk = request.GET.get('model_pk')
     if the_model_name and the_model_pk:
-        sqs = sqs.filter(the_model_name__exact=the_model_name, the_model_pk__exact=the_model_pk)
+        sqs = sqs.filter(
+            the_model_name__exact=the_model_name,
+            the_model_pk__exact=the_model_pk)
     else:
         # allow multiple models and pks
         model_names_pks = request.GET.get('model_names_pks')
@@ -444,7 +442,10 @@ def filter_annotations(request, sqs):
             sq = SQ()
             for model_name_pk in model_names_pks:
                 model_name, model_pk = model_name_pk.split(',')
-                sq.add(SQ(the_model_name__exact=model_name, the_model_pk__exact=model_pk), SQ.OR)
+                sq.add(
+                    SQ(the_model_name__exact=model_name,
+                       the_model_pk__exact=model_pk),
+                    SQ.OR)
             sqs = sqs.filter(sq)
     # date range
     datetime_from = request.GET.get('datetime_from')
@@ -512,15 +513,16 @@ class AnnotationsCreateView(generics.CreateAPIView):
             related_model = obj.get_related_model()
             if related_model:
                 try:
-                    if related_model._meta.get_field('point_geometry') and related_model.point_geometry:
+                    if (related_model._meta.get_field('point_geometry')
+                        and related_model.point_geometry):
                         coords = related_model.point_geometry.coords
-                        obj.location = DjangoGisPoint(
+                        obj.location = Point(
                             coords[0],
                             coords[1],
                             srid=4326
                         )
                         obj.save()
-                except FieldDoesNotExist as ex:
+                except FieldDoesNotExist:
                     pass
 
 
@@ -547,7 +549,7 @@ class AnnotationsFileForm(forms.Form):
     def clean_attachment(self):
         attachment = self.cleaned_data.get('attachment')
         if attachment:
-            if attachment._size > 10*1024*1024:
+            if attachment._size > 10 * 1024 * 1024:
                 raise ValidationError("File too large ( > 10mb )")
             return attachment
 
@@ -576,7 +578,6 @@ class AnnotationsFileView(APIView):
             content=FileWrapper(open(path, 'rb')),
             content_type=content_type
         )
-        #response['Content-Disposition'] = 'attachment; filename="{0}"'.format(attachment.name)
         response['Content-Length'] = os.path.getsize(path)
         return response
 
@@ -603,17 +604,17 @@ class AnnotationsFileView(APIView):
                 'filename': attachment_model.name,
                 'url': attachment_model.absurl(request),
                 'attachment_pk': attachment_model.pk,
-                #'thumbnail_url': settings.MEDIA_URL + "pictures/" + f.name.replace(" ", "_"),
-                #'delete_url': reverse('upload-delete', args=[self.object.id]), 'delete_type': "DELETE"
             }
             status = 200
         else:
             data = {'success': False, 'errors': form.errors}
-            status = 200 # Keep this 200
+            status = 200  # Keep this 200
 
         # Yes, we need to use text/plain for this to support IE9.
         # return Response(data, status=status)
-        return HttpResponse(content=simplejson.dumps(data), status=status, content_type='text/plain')
+        return HttpResponse(
+            content=simplejson.dumps(data),
+            status=status, content_type='text/plain')
 
 
 class VersionView(APIView):
@@ -621,6 +622,6 @@ class VersionView(APIView):
         # Only import ddsc_api here so that ddsc_site can be tested on its
         # own, as long as this view isn't called.
         import ddsc_api
-        response = {'version' : Installed(ddsc_api).version}
+        response = {'version': Installed(ddsc_api).version}
 
         return Response(response)

@@ -15,6 +15,7 @@ class WorkspaceAdmin(admin.ModelAdmin):
         WorkspaceItemInline,
     ]
 
+
 class CollageItemInline(admin.TabularInline):
     model = models.CollageItem
 
@@ -23,6 +24,7 @@ class CollageAdmin(admin.ModelAdmin):
     inlines = [
         CollageItemInline,
     ]
+
 
 class UserProfileAdmin(admin.ModelAdmin):
     model = models.UserProfile

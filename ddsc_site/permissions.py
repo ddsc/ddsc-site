@@ -1,6 +1,13 @@
 from rest_framework import permissions
 
-from ddsc_site.models import Collage, CollageItem, Workspace, WorkspaceItem, Annotation
+from ddsc_site.models import (
+    Collage,
+    CollageItem,
+    Workspace,
+    WorkspaceItem,
+    Annotation
+)
+
 
 class IsCreatorOrReadOnly(permissions.BasePermission):
     """
@@ -22,7 +29,8 @@ class IsCreatorOrReadOnly(permissions.BasePermission):
                     # New object?
                     return True
                 else:
-                    # Update permissions are only allowed to the original creator of things
+                    # Update permissions are only allowed to the
+                    # original creator of things
                     if view.model is Workspace:
                         return obj.creator == request.user
                     elif view.model is WorkspaceItem:
