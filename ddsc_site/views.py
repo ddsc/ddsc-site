@@ -347,7 +347,8 @@ class CurrentAccount(APIView):
                              'first_name': user.first_name,
                              'last_name': user.last_name},
                     'initialPeriod': profile.initial_period,
-                    'initialZoom': profile.initial_zoom
+                    'initialZoom': profile.initial_zoom,
+                    'panner': profile.panner
                     }
         else:
             data = {'authenticated': False,
@@ -355,7 +356,8 @@ class CurrentAccount(APIView):
                              'first_name': 'n.v.t.',
                              'last_name': 'n.v.t.'},
                     'initialPeriod': '',
-                    'initialZoom': ''
+                    'initialZoom': '',
+                    'panner': False
                     }
         return Response(data)
 
