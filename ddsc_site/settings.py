@@ -51,9 +51,6 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-# TODO: Switch this to the real production database.
-# ^^^ 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-# In case of geodatabase, prepend with: django.contrib.gis.db.backends.(postgis)
 DATABASES = {
     'default': {
         'NAME': 'ddsc_site',
