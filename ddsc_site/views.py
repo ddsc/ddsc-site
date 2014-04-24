@@ -368,6 +368,7 @@ class CurrentAccount(APIView):
             profile = UserProfile.get_or_create_profile(user)
             profile.initial_period = request.DATA.get('initialPeriod')
             profile.initial_zoom = request.DATA.get('initialZoom')
+            profile.panner = request.DATA.get('panner')
             try:
                 profile.full_clean()
                 profile.save()
