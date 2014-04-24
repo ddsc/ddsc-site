@@ -5,7 +5,9 @@ Changelog of ddsc-site
 0.1 (unreleased)
 ----------------
 
-- Added lizard-wms.
+- Fix bootstrapping problem with UserProfile.
+
+- Added lizard-wms. (Wish you didn't!)
 
 - Added settings for staging site.
 

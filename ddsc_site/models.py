@@ -3,22 +3,23 @@ from __future__ import print_function, unicode_literals
 from __future__ import absolute_import, division
 
 import datetime
-import random
 import os
+import random
 
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.gis.db.models import PointField
+from django.contrib.gis.geos import Point
+from django.core.exceptions import ValidationError
+from django.core.urlresolvers import reverse
+from django.db import connection
 from django.db import models
 from django.db.models.loading import get_model
-from django.conf import settings
-from django.core.exceptions import ValidationError
-from django.contrib.auth.models import Group, User
-from django.contrib.gis.geos import GEOSGeometry, Point
-from django.contrib.gis.db.models import PointField
 from django.db.models.signals import post_save
-from django.core.urlresolvers import reverse
-
-from lizard_wms.models import WMSSource
 
 from jsonfield.fields import JSONField
+
+from lizard_wms.models import WMSSource
 
 
 class Visibility:
@@ -32,11 +33,13 @@ VISIBILITY_CHOICES = (
     (Visibility.PUBLIC, 'public'),
 )
 
+
 class Collage(models.Model):
     """Collages."""
 
     name = models.CharField(max_length=100, null=False, blank=False)
-    visibility = models.SmallIntegerField(default=1, choices=VISIBILITY_CHOICES)
+    visibility = models.SmallIntegerField(
+        default=1, choices=VISIBILITY_CHOICES)
     creator = models.ForeignKey(User)
 
     def __unicode__(self):
@@ -61,7 +64,8 @@ class CollageItem(models.Model):
 
 class Workspace(models.Model):
     name = models.CharField(max_length=100, null=False, blank=False)
-    visibility = models.SmallIntegerField(default=1, choices=VISIBILITY_CHOICES)
+    visibility = models.SmallIntegerField(
+        default=1, choices=VISIBILITY_CHOICES)
     creator = models.ForeignKey(User)
     lon_lat_zoom = models.CharField(max_length=255, null=True, blank=True)
     order = models.IntegerField(default=0)
@@ -95,7 +99,8 @@ class ProxyHostname(models.Model):
     '''
     name = models.CharField(
         max_length=255, null=True, blank=True,
-        help_text='Optional name of the site, to identify why it needs to be proxied.'
+        help_text=('Optional name of the site, to identify why it ' +
+                   'needs to be proxied.')
     )
     hostname = models.CharField(
         max_length=255, null=False, blank=False,
@@ -103,7 +108,8 @@ class ProxyHostname(models.Model):
     )
 
     def __unicode__(self):
-        return "ProxyHostname {0}, with name {1}".format(self.hostname, self.name)
+        return "ProxyHostname {0}, with name {1}".format(
+            self.hostname, self.name)
 
 
 class Annotation(models.Model):
@@ -144,7 +150,8 @@ class Annotation(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True, editable=False
     )
-    # Keep the following column (used in get_updated_field of the search index).
+    # Keep the following column (used in get_updated_field of the
+    # search index).
     updated_at = models.DateTimeField(
         auto_now=True, editable=False
     )
@@ -156,7 +163,8 @@ class Annotation(models.Model):
         y_length = 10
         tags = ['tag{0}'.format(i) for i in range(10)]
         model_names = ['location', 'timeseries']
-        picture_urls = [None, 'http://www.nelen-schuurmans.nl/images/476/0/2/0/58.jpg']
+        picture_urls = [
+            None, 'http://www.nelen-schuurmans.nl/images/476/0/2/0/58.jpg']
         for x in range(x_length):
             for y in range(y_length):
                 i = x * y
@@ -173,9 +181,11 @@ class Annotation(models.Model):
                     srid=4326
                 )
                 a.datetime_from = datetime.datetime.now()
-                a.datetime_until = datetime.datetime.now() + datetime.timedelta(hours=4)
+                a.datetime_until = (
+                    datetime.datetime.now() + datetime.timedelta(hours=4))
                 a.visibility = Visibility.PUBLIC
-                a.tags = '{0} {1}'.format(random.choice(tags), random.choice(tags))
+                a.tags = '{0} {1}'.format(
+                    random.choice(tags), random.choice(tags))
                 a.save()
 
     def find_model(self):
@@ -190,7 +200,7 @@ class Annotation(models.Model):
         if model:
             try:
                 model_instance = model.objects.get(pk=self.the_model_pk)
-            except model.DoesNotExist as ex:
+            except model.DoesNotExist:
                 model_instance = None
             return model_instance
 
@@ -200,15 +210,20 @@ class Annotation(models.Model):
             return str(model_instance)
 
     def clean(self):
-        # Following won't work: DjangoRestFramework only supplies a pre_save method.
-        # This is called AFTER model.is_valid(), which is what runs this model.clean() method.
+        # Following won't work: DjangoRestFramework only supplies a
+        # pre_save method.  This is called AFTER model.is_valid(),
+        # which is what runs this model.clean() method.
         #if not self.username:
         #    raise ValidationError('No username supplied.')
+
         if self.the_model_name:
             if self.the_model_name not in ['location', 'timeseries']:
-                raise ValidationError('Model "{0}" not supported for annotations.'.format(self.the_model_name))
+                raise ValidationError(
+                    'Model "{0}" not supported for annotations.'
+                    .format(self.the_model_name))
         if self.the_model_name is None and self.the_model_pk:
-            raise ValidationError('Model PK is supplied, but no model name given.')
+            raise ValidationError(
+                'Model PK is supplied, but no model name given.')
 
     def __unicode__(self):
         return "Annotation {0}".format(self.pk)
@@ -220,7 +235,8 @@ class AnnotationAttachment(models.Model):
     creator = models.ForeignKey(User)
 
     def __unicode__(self):
-        return "AnnotationAttachment {0}, annotation {1}".format(self.pk, self.annotation)
+        return "AnnotationAttachment {0}, annotation {1}".format(
+            self.pk, self.annotation)
 
     def filename(self):
         if self.pk is None:
@@ -234,11 +250,14 @@ class AnnotationAttachment(models.Model):
         return ''.join(fn)
 
     def path(self):
-        path = os.path.join(settings.ANNOTATION_ATTACHMENTS_DIR, self.filename())
+        path = os.path.join(
+            settings.ANNOTATION_ATTACHMENTS_DIR, self.filename())
         return os.path.abspath(path)
 
     def absurl(self, request):
-        url = request.build_absolute_uri(reverse('annotations-files-get', kwargs={'pk': self.pk, 'filename': self.name}))
+        url = request.build_absolute_uri(
+            reverse('annotations-files-get',
+                    kwargs={'pk': self.pk, 'filename': self.name}))
         return url
 
 
@@ -251,8 +270,10 @@ class UserProfileManager(models.Manager):
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User)
-    initial_period = models.CharField(max_length=16, null=True, blank=True, default='')
-    initial_zoom = models.CharField(max_length=255, null=True, blank=True, default='')
+    initial_period = models.CharField(
+        max_length=16, null=True, blank=True, default='')
+    initial_zoom = models.CharField(
+        max_length=255, null=True, blank=True, default='')
     panner = models.BooleanField(default=False)
 
     objects = UserProfileManager()
@@ -260,26 +281,40 @@ class UserProfile(models.Model):
     def clean(self):
         valid_periods = ['', '24h', '48h', '1w', '1m', '1y']
         if self.initial_period not in valid_periods:
-            raise ValidationError('Period "{}" is not a valid period; pick one of "{}"'.format(self.initial_period, valid_periods))
+            raise ValidationError(
+                'Period "{}" is not a valid period; pick one of "{}"'
+                .format(self.initial_period, valid_periods))
 
     def __unicode__(self):
         if self.user:
-            return 'UserProfile {} ({}, {})'.format(self.pk, self.user, self.user.email)
+            return 'UserProfile {} ({}, {})'.format(
+                self.pk, self.user, self.user.email)
         else:
             return 'UserProfile {}'.format(self.pk)
 
     @staticmethod
     def get_or_create_profile(user):
         """
-        Return the UserProfile for the given user, creating one if it does not exist.
+        Return the UserProfile for the given user, creating one if it
+        does not exist.
         """
         profile, c = UserProfile.objects.get_or_create(user=user)
         return profile
 
+
+def db_table_exists(table_name):
+    return table_name in connection.introspection.table_names()
+
+
 # have the creation of a User trigger the creation of a Profile
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
-        UserProfile.objects.create(user=instance)
-
+        # Initially, when applying syncdb, there is no ddsc_site_userprofile
+        # table yet, making the createsuperuser command fail. This problem
+        # is addressed by checking the existence of the table first. (An
+        # alternative would be to defer the creation of an admin account
+        # until all database migrations have been applied.)
+        if db_table_exists("ddsc_site_userprofile"):
+            UserProfile.objects.create(user=instance)
 
 post_save.connect(create_user_profile, sender=User)
