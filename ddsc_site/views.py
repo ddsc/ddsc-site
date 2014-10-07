@@ -8,7 +8,6 @@ import urllib
 import os
 import mimetypes
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.views.generic import View
 from django.http import HttpResponse, HttpResponseForbidden, Http404
@@ -415,19 +414,21 @@ def filter_annotations(request, sqs):
         bottom_left = Point(float(bottom_left[0]), float(bottom_left[1]))
         top_right = Point(float(top_right[0]), float(top_right[1]))
         sqs = sqs.within('location', bottom_left, top_right)
-    # user
-    username = request.user.username
-    # allow username overriding in DEBUG mode
-    # this is a possible security leak
-    username_override = request.GET.get('username_override')
-    if settings.DEBUG and username_override:
-        username = username_override
-    sqs = sqs.filter(
-        # either private and linked to the current user
-        SQ(username__exact=username, visibility=Visibility.PRIVATE) |
-        # or public
-        SQ(visibility=Visibility.PUBLIC)
-    )
+    # As decided during the UAT on 2014-09-09: no more private annotations,
+    # all annotations will be public. Hence, we don't need filtering.
+    ### user
+    ##username = request.user.username
+    ### allow username overriding in DEBUG mode
+    ### this is a possible security leak
+    ##username_override = request.GET.get('username_override')
+    ##if settings.DEBUG and username_override:
+    ##    username = username_override
+    ##sqs = sqs.filter(
+    ##    # either private and linked to the current user
+    ##    SQ(username__exact=username, visibility=Visibility.PRIVATE) |
+    ##    # or public
+    ##    SQ(visibility=Visibility.PUBLIC)
+    ##)
     # relation to model instances
     the_model_name = request.GET.get('model_name')
     the_model_pk = request.GET.get('model_pk')
