@@ -516,7 +516,7 @@ class AnnotationsCreateView(generics.CreateAPIView):
             if related_model:
                 try:
                     if (related_model._meta.get_field('point_geometry')
-                        and related_model.point_geometry):
+                            and related_model.point_geometry):
                         coords = related_model.point_geometry.coords
                         obj.location = Point(
                             coords[0],
