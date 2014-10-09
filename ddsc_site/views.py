@@ -379,6 +379,11 @@ class CurrentAccount(APIView):
 
 
 def filter_annotations(request, sqs):
+    # The current situation makes no sense: authenticated users can see fewer
+    # annotations than anonymous users. Let's repair this by returning an
+    # empty queryset if the current user has not logged in.
+    if not request.user.is_authenticated():
+        return sqs.none()
     # category
     category = request.GET.get('category')
     if category:
@@ -416,6 +421,7 @@ def filter_annotations(request, sqs):
         sqs = sqs.within('location', bottom_left, top_right)
     # As decided during the UAT on 2014-09-09: no more private annotations,
     # all annotations will be public. Hence, we don't need filtering.
+    # Well, not entirely: public for authenticated users only.
     ### user
     ##username = request.user.username
     ### allow username overriding in DEBUG mode
