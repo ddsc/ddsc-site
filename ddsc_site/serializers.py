@@ -272,6 +272,10 @@ class AnnotationCreateSerializer(serializers.ModelSerializer):
     tags = serializers.CharField(required=False, widget=widgets.Textarea)
     visibility = VisibilityField(
         required=True,
+        # UAT 2014-09-09: annotations are public for authenticated users.
+        # A simple solution to meet this requirement is a default. NB:
+        # ddsc/webclient no longer sends this field on creation.
+        default=Visibility.PUBLIC,
         choices=(
             (Visibility.PRIVATE, 'private'),
             (Visibility.PUBLIC, 'public'),
