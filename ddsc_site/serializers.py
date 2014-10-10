@@ -258,6 +258,9 @@ class AnnotationSerializer(HyperlinkedIdModelSerializer):
 
     class Meta:
         model = Annotation
+        # UAT 2014-09-09: annotations are public for authenticated users.
+        # Let's exclude this field for now. TODO: remove it entirely.
+        exclude = ('visibility',)
 
 
 class AnnotationCreateSerializer(serializers.ModelSerializer):
@@ -300,3 +303,6 @@ class AnnotationDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Annotation
         read_only = ('username',)
+        # UAT 2014-09-09: annotations are public for authenticated users.
+        # Let's exclude this field for now. TODO: remove it entirely.
+        exclude = ('visibility',)
