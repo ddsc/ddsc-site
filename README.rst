@@ -1,8 +1,6 @@
 DDSC-site: front-end Lizard site
 ==========================================
 
-We're going to be the http://test.dijkdata.nl/ site, installed on ``s-ddsc-ws-d1.external-nens.local``.
-
 This webapplication's primary purpose is to speak REST according to
 the rest-api defined at http://ddsc.github.com/api .
 
